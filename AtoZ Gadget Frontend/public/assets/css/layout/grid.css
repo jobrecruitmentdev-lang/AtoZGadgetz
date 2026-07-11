@@ -1,0 +1,108 @@
+/* Responsive Grid System (Section 41 & Section 50) */
+
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+/* Breakpoints (Section 13) */
+@media (min-width: 375px) {
+  .container { max-width: 350px; }
+}
+@media (min-width: 425px) {
+  .container { max-width: 400px; }
+}
+@media (min-width: 576px) {
+  .container { max-width: 540px; }
+}
+@media (min-width: 768px) {
+  .container { max-width: 720px; }
+}
+@media (min-width: 992px) {
+  .container { max-width: 960px; }
+}
+@media (min-width: 1200px) {
+  .container { max-width: 1140px; }
+}
+@media (min-width: 1400px) {
+  .container { max-width: 1320px; }
+}
+@media (min-width: 1600px) {
+  .container { max-width: 1440px; }
+}
+
+/* Grid Layout */
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .row {
+    grid-template-columns: repeat(8, 1fr);
+    gap: var(--spacing-5);
+  }
+}
+
+@media (min-width: 1200px) {
+  .row {
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--spacing-6);
+  }
+}
+
+/* Column Spanning */
+.span-1 { grid-column: span 1; }
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
+.span-4 { grid-column: span 4; }
+.span-full { grid-column: 1 / -1; }
+
+@media (min-width: 768px) {
+  .span-md-1 { grid-column: span 1; }
+  .span-md-2 { grid-column: span 2; }
+  .span-md-3 { grid-column: span 3; }
+  .span-md-4 { grid-column: span 4; }
+  .span-md-6 { grid-column: span 6; }
+  .span-md-8 { grid-column: span 8; }
+}
+
+@media (min-width: 1200px) {
+  .span-lg-1 { grid-column: span 1; }
+  .span-lg-2 { grid-column: span 2; }
+  .span-lg-3 { grid-column: span 3; }
+  .span-lg-4 { grid-column: span 4; }
+  .span-lg-6 { grid-column: span 6; }
+  .span-lg-8 { grid-column: span 8; }
+  .span-lg-9 { grid-column: span 9; }
+  .span-lg-12 { grid-column: span 12; }
+}
+
+/* Flex layout utilities */
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.align-center {
+  align-items: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.justify-center {
+  justify-content: center;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+.gap-2 { gap: var(--spacing-2); }
+.gap-3 { gap: var(--spacing-3); }
+.gap-4 { gap: var(--spacing-4); }
+.gap-6 { gap: var(--spacing-6); }
+.gap-8 { gap: var(--spacing-8); }

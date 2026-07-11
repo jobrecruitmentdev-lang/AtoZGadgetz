@@ -1,0 +1,120 @@
+/* ================================================================
+   Coupon Box Component – Premium Voucher Form
+   ================================================================ */
+
+.coupon-box-wrapper {
+  background: linear-gradient(135deg,
+    rgba(var(--primary-rgb, 99, 102, 241), 0.04),
+    rgba(var(--primary-rgb, 99, 102, 241), 0.01)
+  );
+  border: 1px dashed rgba(var(--primary-rgb, 99, 102, 241), 0.3);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-4);
+}
+
+.coupon-box-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-3);
+}
+
+.coupon-input-row {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.coupon-input {
+  flex: 1;
+  height: 42px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: var(--text-sm);
+  padding: 0 var(--spacing-3);
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+}
+
+.coupon-input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.1);
+}
+
+.coupon-apply-btn {
+  height: 42px;
+  padding: 0 var(--spacing-4);
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.coupon-apply-btn:hover:not(:disabled) {
+  background-color: var(--primary-dark, #4f46e5);
+  transform: translateY(-1px);
+}
+
+.coupon-apply-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ── Result Messages ────────────────────────────────────────────── */
+.coupon-result {
+  margin-top: var(--spacing-2);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.coupon-success-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.coupon-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* ── Remove Coupon Button ───────────────────────────────────────── */
+.coupon-remove-btn {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--danger);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-top: var(--spacing-2);
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+
+.coupon-remove-btn:hover {
+  color: #dc2626;
+}

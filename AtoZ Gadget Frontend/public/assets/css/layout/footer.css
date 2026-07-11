@@ -1,0 +1,121 @@
+/* Premium Footer Styles */
+
+.footer-wrapper {
+  background-color: var(--surface);
+  border-top: 1px solid var(--border-light);
+  padding-top: var(--spacing-16);
+  padding-bottom: var(--spacing-8);
+  font-size: 0.875rem;
+}
+
+.footer-top {
+  margin-bottom: var(--spacing-12);
+}
+
+.footer-brand {
+  margin-bottom: var(--spacing-6);
+}
+
+.footer-brand-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: var(--spacing-2);
+}
+
+.footer-brand-title span {
+  background: linear-gradient(135deg, var(--primary), var(--info));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-brand-desc {
+  color: var(--text-muted);
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.footer-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-4);
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.footer-link {
+  color: var(--text);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.footer-link:hover {
+  opacity: 1;
+  color: var(--primary);
+}
+
+/* Newsletter Input Form */
+.footer-newsletter-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+}
+
+.footer-newsletter-input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--spacing-4);
+  background-color: var(--background);
+  color: var(--text);
+  font-size: 0.875rem;
+  transition: border-color var(--transition-fast);
+}
+
+.footer-newsletter-input:focus {
+  border-color: var(--primary);
+}
+
+/* Footer Bottom Section */
+.footer-bottom {
+  border-top: 1px solid var(--border-light);
+  padding-top: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+  .footer-bottom {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.footer-copy {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.footer-payment-logos {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.footer-payment-logos svg {
+  height: 20px;
+  fill: currentColor;
+  opacity: 0.5;
+}

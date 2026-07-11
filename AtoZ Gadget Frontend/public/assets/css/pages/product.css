@@ -1,0 +1,192 @@
+/* Product Details Page (PDP) Layout Stylesheet */
+.pdp-main-wrapper {
+  max-width: 1200px;
+}
+
+/* 1. Image Gallery Showcase */
+.product-gallery-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.gallery-main-window {
+  position: relative;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 460px;
+  cursor: zoom-in;
+}
+
+.gallery-main-img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.3s ease-out;
+}
+
+/* Mouse zoom feature overlay */
+.gallery-main-window:hover .gallery-main-img {
+  transform: scale(1.15);
+}
+
+.gallery-thumbs-row {
+  display: flex;
+  gap: var(--spacing-3);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-2);
+}
+
+.gallery-thumb-item {
+  width: 72px;
+  height: 72px;
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.gallery-thumb-item.active {
+  border-color: var(--primary);
+}
+
+.gallery-thumb-item img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* 2. Variant Attribute Buttons */
+.variant-option-group {
+  margin-bottom: var(--spacing-4);
+}
+
+.variant-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-2);
+}
+
+.variant-options-list {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.variant-btn {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--text);
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.variant-btn:hover {
+  border-color: var(--text);
+}
+
+.variant-btn.active {
+  border-color: var(--primary);
+  background-color: rgba(var(--primary-rgb), 0.05);
+  color: var(--primary);
+}
+
+/* 3. Specs Grouped Table */
+.specs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-4);
+}
+
+.specs-row {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.specs-row:last-child {
+  border-bottom: none;
+}
+
+.specs-name {
+  width: 30%;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  padding: var(--spacing-3) var(--spacing-2);
+}
+
+.specs-val {
+  width: 70%;
+  color: var(--text);
+  font-size: var(--text-xs);
+  padding: var(--spacing-3) var(--spacing-2);
+}
+
+/* 4. Ratings Distribution Progress Lines */
+.distribution-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--text-xs);
+}
+
+.distribution-label {
+  width: 50px;
+  color: var(--text-muted);
+}
+
+.distribution-bar-bg {
+  flex-grow: 1;
+  height: 6px;
+  background-color: var(--border-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.distribution-bar-fill {
+  height: 100%;
+  background-color: #ffb800;
+  border-radius: 3px;
+}
+
+.distribution-count {
+  width: 30px;
+  text-align: right;
+  color: var(--text-muted);
+}
+
+/* 5. Mobile Sticky Bottom Buy Bar */
+.sticky-buy-bar-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+  z-index: 999;
+}
+
+@media (max-width: 768px) {
+  .gallery-main-window {
+    height: 320px;
+  }
+}

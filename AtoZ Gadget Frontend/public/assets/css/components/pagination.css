@@ -1,0 +1,48 @@
+/* Pagination Block Styling (Inspired by Samsung pagers) */
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-10);
+  margin-bottom: var(--spacing-4);
+  width: 100%;
+}
+
+.pagination-btn {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.pagination-btn:hover {
+  background-color: var(--surface-light);
+  border-color: var(--border-hover);
+}
+
+.pagination-btn.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--background);
+}
+
+.pagination-btn.disabled {
+  color: var(--text-muted);
+  border-color: var(--border-light);
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}

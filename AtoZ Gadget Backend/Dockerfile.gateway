@@ -1,0 +1,20 @@
+# Dockerfile for API Gateway
+FROM python:3.11-slim
+
+WORKDIR /gateway_app
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install gateway dependencies only
+RUN pip install --no-cache-dir fastapi uvicorn httpx python-jose python-dotenv
+
+COPY gateway/ ./gateway/
+COPY .env .
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:8080/gateway/health || exit 1
+
+CMD ["uvicorn", "gateway.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]

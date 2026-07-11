@@ -1,0 +1,90 @@
+/* Catalog Toolbar Styles (Inspired by Nothing.tech clean headers) */
+
+.product-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  width: 100%;
+}
+
+.toolbar-left, 
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+/* Mobile Filter Trigger Button */
+.mobile-filter-open-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-3);
+  height: 32px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+/* Grid/List View Buttons */
+.view-toggles {
+  display: flex;
+  gap: 4px;
+}
+
+.view-toggle-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.view-toggle-btn:hover {
+  background-color: var(--surface-light);
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+.view-toggle-btn.active {
+  background-color: var(--primary);
+  color: var(--background);
+  border-color: var(--primary);
+}
+
+/* Sort Selection Box */
+.sort-select {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0 var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  height: 32px;
+  transition: border-color 0.2s ease;
+  min-width: 170px;
+}
+
+.sort-select:hover {
+  border-color: var(--border-hover);
+}
+
+/* Responsive Media break updates */
+@media (max-width: 992px) {
+  .mobile-filter-open-btn {
+    display: inline-flex;
+  }
+}

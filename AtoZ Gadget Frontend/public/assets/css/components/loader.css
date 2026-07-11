@@ -1,0 +1,71 @@
+/* Loader and Skeleton Screen Component Styles (Section 52) */
+
+/* Global Spinner Loader */
+.spinner-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8) 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-light);
+  border-right-color: var(--primary);
+  border-radius: 50%;
+  animation: globalSpinner 750ms linear infinite;
+}
+
+@keyframes globalSpinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Skeleton Screens (Inspired by Apple Premium layout loaders) */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border-light) 25%,
+    var(--border) 50%,
+    var(--border-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s infinite linear;
+  border-radius: var(--radius-sm);
+  color: transparent !important;
+}
+
+.skeleton-text {
+  height: 1rem;
+  margin-bottom: var(--spacing-2);
+}
+
+.skeleton-title {
+  height: 1.5rem;
+  margin-bottom: var(--spacing-4);
+  width: 60%;
+}
+
+.skeleton-media {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-4);
+}
+
+.skeleton-btn {
+  height: 38px;
+  width: 120px;
+  border-radius: var(--radius-md);
+}
+
+@keyframes skeletonLoading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

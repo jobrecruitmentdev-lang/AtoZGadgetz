@@ -1,0 +1,284 @@
+/* Homepage Page Styles (Inspired by Apple Store & Samsung Tech sliders) */
+
+/* 1. Hero Slider Container */
+.hero-slider {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  overflow: hidden;
+  background-color: #0a0a0c;
+}
+
+.hero-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+  display: flex;
+  align-items: center;
+  padding: 0 10%;
+}
+
+.hero-slide.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hero-slide-content {
+  max-width: 620px;
+  color: #fff;
+  z-index: 10;
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-slide-title {
+  font-size: 3rem;
+  line-height: 1.15;
+  margin-bottom: var(--spacing-4);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.hero-slide-desc {
+  font-size: var(--text-base);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--spacing-6);
+  line-height: 1.6;
+}
+
+/* 2. Category Quick Circles Row */
+.category-circle-grid {
+  display: flex;
+  gap: var(--spacing-6);
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto;
+  padding: var(--spacing-4) 0;
+  scrollbar-width: none;
+  width: 100%;
+}
+
+.category-circle-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.category-circle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.category-circle-item:hover {
+  transform: translateY(-3px);
+}
+
+.category-circle-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--surface);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3);
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.category-circle-item:hover .category-circle-icon {
+  border-color: var(--primary);
+  background-color: var(--surface-light);
+}
+
+.category-circle-name {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: var(--spacing-2);
+  transition: color 0.3s ease;
+}
+
+.category-circle-item:hover .category-circle-name {
+  color: var(--text);
+}
+
+/* 3. Popular Brands Badges row */
+.brand-badges-row {
+  display: flex;
+  gap: var(--spacing-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: var(--spacing-2) 0;
+  width: 100%;
+}
+
+.brand-badges-row::-webkit-scrollbar {
+  display: none;
+}
+
+.brand-badge-item {
+  width: 140px;
+  height: 60px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.brand-badge-item:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-hover);
+}
+
+.brand-badge-logo {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  opacity: 0.65;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+[data-theme="dark"] .brand-badge-logo {
+  filter: invert(0.9);
+}
+
+.brand-badge-item:hover .brand-badge-logo {
+  opacity: 1;
+}
+
+/* 4. Tab selection buttons */
+.tab-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px 18px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.active {
+  background-color: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-panel {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* 5. Flash Deals countdown timers */
+.countdown-timer-box {
+  display: flex;
+  align-items: center;
+}
+
+.timer-segment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2) var(--spacing-3);
+  min-width: 58px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.timer-colon {
+  margin: 0 4px;
+  align-self: center;
+  margin-bottom: var(--spacing-3);
+  animation: flash 1s infinite;
+}
+
+@keyframes flash {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 6. Customer testimonial reviews grid */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-6);
+  width: 100%;
+}
+
+.review-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-5);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.review-stars {
+  color: #ffb800;
+  fill: #ffb800;
+  display: flex;
+  gap: 2px;
+  margin-bottom: var(--spacing-2);
+}
+
+/* Responsive updates */
+@media (max-width: 992px) {
+  .reviews-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .flash-deal-container {
+    padding: var(--spacing-5) var(--spacing-6) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-slide-title {
+    font-size: 2.2rem;
+  }
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-slider {
+    height: 420px;
+  }
+  .flash-deal-container {
+    grid-template-columns: 1fr !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
