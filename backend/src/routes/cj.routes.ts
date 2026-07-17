@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   authenticateJWT,
   requireAdminOrSuperAdmin,
-} from '../middlewares/auth.middleware';
+} from '../middlewares/auth.middleware.js';
 import {
   searchCjProducts,
   getCjProductDetail,
@@ -13,7 +13,7 @@ import {
   syncShipment,
   syncAllShipments,
   handleCjWebhook,
-} from '../controllers/cj.controller';
+} from '../controllers/cj.controller.js';
 
 const router = Router();
 

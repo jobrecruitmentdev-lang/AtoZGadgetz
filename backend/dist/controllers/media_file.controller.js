@@ -1,0 +1,25 @@
+import { MediaFileService } from "../services/media_file.service.js";
+import { createMediaFileSchema } from "../validators/media_file.schema.js";
+const service = new MediaFileService();
+export const getAllMediaFiles = async (req, res) => {
+    try {
+        const data = await service.getAll();
+        res.json({ success: true, data });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const createMediaFile = async (req, res) => {
+    try {
+        const input = createMediaFileSchema.parse(req.body);
+        const data = await service.create({ ...input, user_id: req.user.id });
+        res.status(201).json({ success: true, data });
+    }
+    catch (error) {
+        res
+            .status(400)
+            .json({ success: false, message: error.errors || error.message });
+    }
+};
+//# sourceMappingURL=media_file.controller.js.map

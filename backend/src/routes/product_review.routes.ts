@@ -2,8 +2,8 @@ import { Router } from "express";
 import {
   getAllProductReviews,
   createProductReview,
-} from "../controllers/product_review.controller";
-import { authenticateJWT } from "../middlewares/auth.middleware";
+} from "../controllers/product_review.controller.js";
+import { authenticateJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

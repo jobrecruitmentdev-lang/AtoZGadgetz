@@ -4,11 +4,11 @@ import {
   createPayment,
   razorpayCreateOrder,
   razorpayVerify,
-} from '../controllers/payment.controller';
+} from '../controllers/payment.controller.js';
 import {
   authenticateJWT,
   requireAdminOrSuperAdmin,
-} from '../middlewares/auth.middleware';
+} from '../middlewares/auth.middleware.js';
 
 const router = Router();
 

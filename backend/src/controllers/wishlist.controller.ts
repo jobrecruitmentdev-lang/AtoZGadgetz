@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { WishlistService } from "../services/wishlist.service";
-import { addToWishlistSchema } from "../validators/wishlist.schema";
+import { WishlistService } from "../services/wishlist.service.js";
+import { addToWishlistSchema } from "../validators/wishlist.schema.js";
 
 const service = new WishlistService();
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { ReturnOrderService } from "../services/return_order.service";
-import { createReturnOrderSchema } from "../validators/return_order.schema";
+import { ReturnOrderService } from "../services/return_order.service.js";
+import { createReturnOrderSchema } from "../validators/return_order.schema.js";
 
 const service = new ReturnOrderService();
 

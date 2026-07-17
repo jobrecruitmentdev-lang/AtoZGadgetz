@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { OfferService } from "../services/offer.service";
-import { createOfferSchema } from "../validators/offer.schema";
+import { OfferService } from "../services/offer.service.js";
+import { createOfferSchema } from "../validators/offer.schema.js";
 
 const service = new OfferService();
 

@@ -2,11 +2,11 @@ import { Router } from "express";
 import {
   getAllMediaFiles,
   createMediaFile,
-} from "../controllers/media_file.controller";
+} from "../controllers/media_file.controller.js";
 import {
   authenticateJWT,
   requireAdminOrSuperAdmin,
-} from "../middlewares/auth.middleware";
+} from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

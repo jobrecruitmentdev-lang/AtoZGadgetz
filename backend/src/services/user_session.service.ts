@@ -1,4 +1,4 @@
-import { UserSessionRepository } from "../repositories/user_session.repository";
+import { UserSessionRepository } from "../repositories/user_session.repository.js";
 
 const repo = new UserSessionRepository();
 

@@ -45,7 +45,8 @@ process.on("uncaughtException", (error) => {
 });
 
 // Middleware
-app.use(pinoHttp({ logger }));
+  const pinoMiddleware = pinoHttp as any;
+  app.use(pinoMiddleware({ logger }));
 app.use(helmet());
 app.use(express.json());
 

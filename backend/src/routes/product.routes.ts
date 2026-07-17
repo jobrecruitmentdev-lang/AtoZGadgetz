@@ -5,8 +5,8 @@ import {
   updateProduct,
   deleteProduct,
   getProductBySlug,
-} from "../controllers/product.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/product.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

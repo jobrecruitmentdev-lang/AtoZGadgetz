@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { NotificationService } from "../services/notification.service";
-import { createNotificationSchema } from "../validators/notification.schema";
+import { NotificationService } from "../services/notification.service.js";
+import { createNotificationSchema } from "../validators/notification.schema.js";
 
 const service = new NotificationService();
 

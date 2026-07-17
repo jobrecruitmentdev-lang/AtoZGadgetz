@@ -1,4 +1,4 @@
-import { MediaFileRepository } from "../repositories/media_file.repository";
+import { MediaFileRepository } from "../repositories/media_file.repository.js";
 
 const repo = new MediaFileRepository();
 

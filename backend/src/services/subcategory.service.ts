@@ -1,4 +1,4 @@
-import { SubcategoryRepository } from "../repositories/subcategory.repository";
+import { SubcategoryRepository } from "../repositories/subcategory.repository.js";
 import { Prisma } from "@prisma/client";
 
 const subcategoryRepo = new SubcategoryRepository();

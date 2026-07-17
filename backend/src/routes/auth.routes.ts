@@ -6,8 +6,8 @@ import {
   logout,
   forgotPassword,
   resetPassword,
-} from "../controllers/auth.controller";
-import { authenticateJWT } from "../middlewares/auth.middleware";
+} from "../controllers/auth.controller.js";
+import { authenticateJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

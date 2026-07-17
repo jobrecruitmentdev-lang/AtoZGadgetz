@@ -1,9 +1,9 @@
-import { UserRepository } from "../repositories/user.repository";
+import { UserRepository } from "../repositories/user.repository.js";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { config } from "../config/env";
-import { prisma } from "../prisma";
+import { config } from "../config/env.js";
+import { prisma } from "../prisma.js";
 import crypto from "crypto";
 import { sendResetEmail } from "../utils/mailer.js";
 

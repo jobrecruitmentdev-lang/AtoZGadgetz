@@ -4,11 +4,11 @@ import {
   createCoupon,
   updateCoupon,
   deleteCoupon,
-} from "../controllers/coupon.controller";
+} from "../controllers/coupon.controller.js";
 import {
   authenticateJWT,
   requireAdminOrSuperAdmin,
-} from "../middlewares/auth.middleware";
+} from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

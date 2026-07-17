@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { BannerService } from "../services/banner.service";
-import { createBannerSchema } from "../validators/banner.schema";
+import { BannerService } from "../services/banner.service.js";
+import { createBannerSchema } from "../validators/banner.schema.js";
 
 const service = new BannerService();
 

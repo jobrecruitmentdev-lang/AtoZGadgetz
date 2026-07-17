@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { HomepageSectionService } from "../services/homepage_section.service";
-import { createHomepageSectionSchema } from "../validators/homepage_section.schema";
+import { HomepageSectionService } from "../services/homepage_section.service.js";
+import { createHomepageSectionSchema } from "../validators/homepage_section.schema.js";
 
 const service = new HomepageSectionService();
 

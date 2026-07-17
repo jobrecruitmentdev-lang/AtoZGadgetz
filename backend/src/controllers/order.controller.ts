@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { OrderService } from "../services/order.service";
+import { OrderService } from "../services/order.service.js";
 import {
   createOrderSchema,
   updateOrderStatusSchema,
-} from "../validators/order.schema";
+} from "../validators/order.schema.js";
 
 const service = new OrderService();
 

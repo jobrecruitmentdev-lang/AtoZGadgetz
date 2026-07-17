@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { CjAuthService } from './cj-auth.service';
-import { cjHttp } from './cj-http';
+import { CjAuthService } from './cj-auth.service.js';
+import { cjHttp } from './cj-http.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();

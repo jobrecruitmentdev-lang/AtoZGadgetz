@@ -1,4 +1,4 @@
-import { AnalyticsEventRepository } from "../repositories/analytics_event.repository";
+import { AnalyticsEventRepository } from "../repositories/analytics_event.repository.js";
 
 const repo = new AnalyticsEventRepository();
 

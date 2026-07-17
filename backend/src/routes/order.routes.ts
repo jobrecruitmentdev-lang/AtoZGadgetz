@@ -5,12 +5,12 @@ import {
   getOrderById,
   placeOrder,
   updateOrderStatus,
-} from "../controllers/order.controller";
-import { syncShipment } from "../controllers/cj.controller";
+} from "../controllers/order.controller.js";
+import { syncShipment } from "../controllers/cj.controller.js";
 import {
   authenticateJWT,
   requireAdminOrSuperAdmin,
-} from "../middlewares/auth.middleware";
+} from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

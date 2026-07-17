@@ -2,8 +2,8 @@ import { Router } from "express";
 import {
   getAllAuditLogs,
   createAuditLog,
-} from "../controllers/audit_log.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/audit_log.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

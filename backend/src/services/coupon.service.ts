@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { CouponRepository } from "../repositories/coupon.repository";
+import { CouponRepository } from "../repositories/coupon.repository.js";
 
 const repo = new CouponRepository();
 

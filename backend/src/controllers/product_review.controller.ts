@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { ProductReviewService } from "../services/product_review.service";
-import { createProductReviewSchema } from "../validators/product_review.schema";
+import { ProductReviewService } from "../services/product_review.service.js";
+import { createProductReviewSchema } from "../validators/product_review.schema.js";
 
 const service = new ProductReviewService();
 

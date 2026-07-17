@@ -4,8 +4,8 @@ import {
   createBrand,
   updateBrand,
   deleteBrand,
-} from "../controllers/brand.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/brand.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

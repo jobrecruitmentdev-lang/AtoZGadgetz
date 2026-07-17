@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { BannerRepository } from "../repositories/banner.repository";
+import { BannerRepository } from "../repositories/banner.repository.js";
 
 const repo = new BannerRepository();
 

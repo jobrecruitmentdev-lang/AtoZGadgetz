@@ -4,8 +4,8 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
-} from "../controllers/category.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/category.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

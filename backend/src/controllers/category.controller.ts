@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { CategoryService } from "../services/category.service";
-import { createCategorySchema } from "../validators/category.schema";
+import { CategoryService } from "../services/category.service.js";
+import { createCategorySchema } from "../validators/category.schema.js";
 
 const categoryService = new CategoryService();
 

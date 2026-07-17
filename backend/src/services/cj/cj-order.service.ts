@@ -1,6 +1,6 @@
-import { prisma } from '../../prisma';
-import { CjAuthService } from './cj-auth.service';
-import { cjHttp } from './cj-http';
+import { prisma } from '../../prisma.js';
+import { CjAuthService } from './cj-auth.service.js';
+import { cjHttp } from './cj-http.js';
 
 export class CjOrderService {
   private static readonly API_BASE_URL =

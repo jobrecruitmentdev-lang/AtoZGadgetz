@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AuthService } from "../services/auth.service";
-import { registerSchema, loginSchema } from "../validators/auth.schema";
+import { AuthService } from "../services/auth.service.js";
+import { registerSchema, loginSchema } from "../validators/auth.schema.js";
 
 const authService = new AuthService();
 

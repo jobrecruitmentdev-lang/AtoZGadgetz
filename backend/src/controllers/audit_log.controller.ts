@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AuditLogService } from "../services/audit_log.service";
-import { createAuditLogSchema } from "../validators/audit_log.schema";
+import { AuditLogService } from "../services/audit_log.service.js";
+import { createAuditLogSchema } from "../validators/audit_log.schema.js";
 
 const service = new AuditLogService();
 

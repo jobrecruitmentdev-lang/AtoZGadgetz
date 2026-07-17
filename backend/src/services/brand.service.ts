@@ -1,4 +1,4 @@
-import { BrandRepository } from "../repositories/brand.repository";
+import { BrandRepository } from "../repositories/brand.repository.js";
 import { Prisma } from "@prisma/client";
 
 const brandRepo = new BrandRepository();

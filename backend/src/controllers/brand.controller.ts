@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { BrandService } from "../services/brand.service";
-import { createBrandSchema } from "../validators/brand.schema";
+import { BrandService } from "../services/brand.service.js";
+import { createBrandSchema } from "../validators/brand.schema.js";
 
 const brandService = new BrandService();
 

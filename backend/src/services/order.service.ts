@@ -1,4 +1,4 @@
-import { OrderRepository } from "../repositories/order.repository";
+import { OrderRepository } from "../repositories/order.repository.js";
 
 const repo = new OrderRepository();
 

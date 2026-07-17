@@ -4,8 +4,8 @@ import {
   createHomepageSection,
   updateHomepageSection,
   deleteHomepageSection,
-} from "../controllers/homepage_section.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/homepage_section.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

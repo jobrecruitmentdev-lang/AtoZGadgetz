@@ -2,8 +2,8 @@ import { Router } from "express";
 import {
   getSubcategories,
   createSubcategory,
-} from "../controllers/subcategory.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/subcategory.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

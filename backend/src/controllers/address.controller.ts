@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AddressService } from "../services/address.service";
-import { createAddressSchema } from "../validators/address.schema";
+import { AddressService } from "../services/address.service.js";
+import { createAddressSchema } from "../validators/address.schema.js";
 
 const service = new AddressService();
 

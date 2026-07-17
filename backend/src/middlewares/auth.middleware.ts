@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { prisma } from "../prisma";
-import { config } from "../config/env";
+import { prisma } from "../prisma.js";
+import { config } from "../config/env.js";
 import { Prisma } from "@prisma/client";
 
 export type UserWithRoleAndPermissions = Prisma.UserGetPayload<{

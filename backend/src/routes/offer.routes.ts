@@ -4,8 +4,8 @@ import {
   createOffer,
   updateOffer,
   deleteOffer,
-} from "../controllers/offer.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/offer.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

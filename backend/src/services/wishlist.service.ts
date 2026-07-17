@@ -1,5 +1,5 @@
-import { WishlistRepository } from "../repositories/wishlist.repository";
-import { prisma } from "../prisma";
+import { WishlistRepository } from "../repositories/wishlist.repository.js";
+import { prisma } from "../prisma.js";
 
 const repo = new WishlistRepository();
 

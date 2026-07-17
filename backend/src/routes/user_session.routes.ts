@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getAllUserSessions } from "../controllers/user_session.controller";
-import { authenticateJWT } from "../middlewares/auth.middleware";
+import { getAllUserSessions } from "../controllers/user_session.controller.js";
+import { authenticateJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

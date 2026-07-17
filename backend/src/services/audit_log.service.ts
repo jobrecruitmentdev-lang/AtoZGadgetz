@@ -1,4 +1,4 @@
-import { AuditLogRepository } from "../repositories/audit_log.repository";
+import { AuditLogRepository } from "../repositories/audit_log.repository.js";
 
 const repo = new AuditLogRepository();
 

@@ -1,4 +1,4 @@
-import { ProductReviewRepository } from "../repositories/product_review.repository";
+import { ProductReviewRepository } from "../repositories/product_review.repository.js";
 
 const repo = new ProductReviewRepository();
 

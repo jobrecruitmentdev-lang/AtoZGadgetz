@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AnalyticsEventService } from "../services/analytics_event.service";
-import { createAnalyticsEventSchema } from "../validators/analytics_event.schema";
+import { AnalyticsEventService } from "../services/analytics_event.service.js";
+import { createAnalyticsEventSchema } from "../validators/analytics_event.schema.js";
 
 const service = new AnalyticsEventService();
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { InventoryService } from "../services/inventory.service";
-import { createInventorySchema } from "../validators/inventory.schema";
+import { InventoryService } from "../services/inventory.service.js";
+import { createInventorySchema } from "../validators/inventory.schema.js";
 
 const service = new InventoryService();
 

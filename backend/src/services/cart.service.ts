@@ -1,5 +1,5 @@
-import { CartRepository } from "../repositories/cart.repository";
-import { prisma } from "../prisma";
+import { CartRepository } from "../repositories/cart.repository.js";
+import { prisma } from "../prisma.js";
 
 const cartRepo = new CartRepository();
 

@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { HomepageSectionRepository } from "../repositories/homepage_section.repository";
+import { HomepageSectionRepository } from "../repositories/homepage_section.repository.js";
 
 const repo = new HomepageSectionRepository();
 

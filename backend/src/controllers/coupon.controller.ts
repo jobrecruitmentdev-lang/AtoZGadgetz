@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { CouponService } from "../services/coupon.service";
-import { createCouponSchema } from "../validators/coupon.schema";
+import { CouponService } from "../services/coupon.service.js";
+import { createCouponSchema } from "../validators/coupon.schema.js";
 
 const service = new CouponService();
 

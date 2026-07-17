@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { ProductService } from "../services/product.service";
-import { createProductSchema } from "../validators/product.schema";
+import { ProductService } from "../services/product.service.js";
+import { createProductSchema } from "../validators/product.schema.js";
 
 const productService = new ProductService();
 

@@ -1,4 +1,4 @@
-import { AddressRepository } from "../repositories/address.repository";
+import { AddressRepository } from "../repositories/address.repository.js";
 
 const repo = new AddressRepository();
 

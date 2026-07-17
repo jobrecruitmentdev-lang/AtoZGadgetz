@@ -4,8 +4,8 @@ import {
   createBanner,
   updateBanner,
   deleteBanner,
-} from "../controllers/banner.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/banner.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

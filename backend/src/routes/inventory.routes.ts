@@ -4,8 +4,8 @@ import {
   createInventory,
   updateInventory,
   deleteInventory,
-} from "../controllers/inventory.controller";
-import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware";
+} from "../controllers/inventory.controller.js";
+import { authenticateJWT, authorizeRBAC } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

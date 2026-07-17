@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { MediaFileService } from "../services/media_file.service";
-import { createMediaFileSchema } from "../validators/media_file.schema";
+import { MediaFileService } from "../services/media_file.service.js";
+import { createMediaFileSchema } from "../validators/media_file.schema.js";
 
 const service = new MediaFileService();
 

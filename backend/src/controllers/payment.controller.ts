@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { PaymentService } from '../services/payment.service';
-import { RazorpayService } from '../services/payment/razorpay.service';
-import { CjOrderService } from '../services/cj/cj-order.service';
-import { prisma } from '../prisma';
-import { createPaymentSchema } from '../validators/payment.schema';
+import { PaymentService } from '../services/payment.service.js';
+import { RazorpayService } from '../services/payment/razorpay.service.js';
+import { CjOrderService } from '../services/cj/cj-order.service.js';
+import { prisma } from '../prisma.js';
+import { createPaymentSchema } from '../validators/payment.schema.js';
 
 const service = new PaymentService();
 

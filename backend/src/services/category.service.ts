@@ -1,4 +1,4 @@
-import { CategoryRepository } from "../repositories/category.repository";
+import { CategoryRepository } from "../repositories/category.repository.js";
 import { Prisma } from "@prisma/client";
 
 const categoryRepo = new CategoryRepository();

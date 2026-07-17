@@ -1,4 +1,4 @@
-import { PaymentRepository } from "../repositories/payment.repository";
+import { PaymentRepository } from "../repositories/payment.repository.js";
 
 const repo = new PaymentRepository();
 

@@ -1,4 +1,4 @@
-import { ShipmentRepository } from "../repositories/shipment.repository";
+import { ShipmentRepository } from "../repositories/shipment.repository.js";
 
 const repo = new ShipmentRepository();
 

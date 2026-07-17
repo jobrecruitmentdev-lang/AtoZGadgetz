@@ -1,4 +1,4 @@
-import { ReturnOrderRepository } from "../repositories/return_order.repository";
+import { ReturnOrderRepository } from "../repositories/return_order.repository.js";
 
 const repo = new ReturnOrderRepository();
 

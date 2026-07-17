@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { CartService } from "../services/cart.service";
-import { addToCartSchema } from "../validators/cart.schema";
+import { CartService } from "../services/cart.service.js";
+import { addToCartSchema } from "../validators/cart.schema.js";
 
 const cartService = new CartService();
 

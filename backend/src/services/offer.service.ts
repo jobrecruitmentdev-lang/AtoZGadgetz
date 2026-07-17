@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { OfferRepository } from "../repositories/offer.repository";
+import { OfferRepository } from "../repositories/offer.repository.js";
 
 const repo = new OfferRepository();
 

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserSessionService } from "../services/user_session.service";
+import { UserSessionService } from "../services/user_session.service.js";
 
 const service = new UserSessionService();
 

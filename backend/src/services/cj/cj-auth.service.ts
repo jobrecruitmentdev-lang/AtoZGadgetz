@@ -1,4 +1,4 @@
-import { cjHttp } from './cj-http';
+import { cjHttp } from './cj-http.js';
 
 let cjAccessToken: string | null = null;
 let cjTokenExpiry: number = 0;

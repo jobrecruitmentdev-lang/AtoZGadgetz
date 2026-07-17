@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { CjProductService } from '../services/cj/cj-product.service';
-import { CjOrderService } from '../services/cj/cj-order.service';
-import { CjShipmentService } from '../services/cj/cj-shipment.service';
+import { CjProductService } from '../services/cj/cj-product.service.js';
+import { CjOrderService } from '../services/cj/cj-order.service.js';
+import { CjShipmentService } from '../services/cj/cj-shipment.service.js';
 
 const prisma = new PrismaClient();
 
