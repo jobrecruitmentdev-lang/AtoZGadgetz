@@ -26,7 +26,7 @@ export const authenticateJWT = async (
       return res
         .status(401)
         .json({ success: false, message: "Invalid token format" });
-    jwt.verify(token, config.jwtSecret, async (err, decoded: any) => {
+    jwt.verify(token, config.jwtSecret, { algorithms: ["HS256"] }, async (err, decoded: any) => {
       if (err) {
         return res
           .status(401)

@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/env";
 import { prisma } from "../prisma";
 import crypto from "crypto";
+import { sendResetEmail } from "../utils/mailer.js";
 
 const userRepo = new UserRepository();
 
@@ -68,8 +69,7 @@ export class AuthService {
     });
 
     // In a real app, send the rawToken via email here.
-    // e.g. https://example.com/reset-password?token=${rawToken}
-    console.log(`[Email Mock] To: ${email}, Link: http://localhost:3000/reset-password?token=${rawToken}`);
+    await sendResetEmail(email, rawToken);
   }
 
   async resetPassword(token: string, newPassword: string) {
