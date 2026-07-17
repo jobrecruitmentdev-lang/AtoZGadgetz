@@ -1,0 +1,107 @@
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { prisma } from "../prisma";
+import { config } from "../config/env";
+import { Prisma } from "@prisma/client";
+
+export type UserWithRoleAndPermissions = Prisma.UserGetPayload<{
+  include: {
+    role: { include: { permissions: { include: { permission: true } } } };
+  };
+}>;
+
+export interface AuthRequest extends Request {
+  user: UserWithRoleAndPermissions;
+}
+
+export const authenticateJWT = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+    if (!token)
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid token format" });
+    jwt.verify(token, config.jwtSecret, async (err, decoded: any) => {
+      if (err) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid token" });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.sub },
+        include: {
+          role: { include: { permissions: { include: { permission: true } } } },
+        },
+      });
+
+      if (!user) {
+        return res
+          .status(401)
+          .json({ success: false, message: "User not found" });
+      }
+
+      (req as AuthRequest).user = user;
+      next();
+    });
+  } else {
+    res
+      .status(401)
+      .json({ success: false, message: "Authorization header missing" });
+  }
+};
+
+export const authorizeRBAC = (requiredPermissions: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    // Bypass RBAC for SuperAdmin and Admin
+    if (authReq.user.role_id === 1 || authReq.user.role_id === 2) {
+      return next();
+    }
+
+    const userPermissions = authReq.user.role.permissions.map(
+      (rp: any) => rp.permission.permission_name,
+    );
+
+    const hasPermission = requiredPermissions.every((rp) =>
+      userPermissions.includes(rp),
+    );
+
+    if (!hasPermission) {
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "Forbidden: Insufficient permissions",
+        });
+    }
+
+    next();
+  };
+};
+
+// Mirrors FastAPI's require_admin_or_super_admin — role check, not permission-string
+// check, since several admin-only actions (order/shipment/return management) aren't
+// covered by a dedicated entry in the permissions table.
+export const requireAdminOrSuperAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const authReq = req as AuthRequest;
+  if (!authReq.user || (authReq.user.role_id !== 1 && authReq.user.role_id !== 2)) {
+    return res
+      .status(403)
+      .json({ success: false, message: "Forbidden: Admins only" });
+  }
+  next();
+};

@@ -1,0 +1,44 @@
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api';
+
+export interface ApiResponse<T = unknown> {
+  success?: boolean;
+  status?: boolean;
+  data?: T;
+  message?: string;
+}
+
+export async function fetchApi<T = unknown>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  // If running on the client, we always use the relative /api proxy
+  const baseUrl = typeof window === 'undefined' 
+    ? (process.env.API_URL || 'http://127.0.0.1:8080/api') 
+    : '';
+
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  // If it's relative client call, ensure it goes to /api/... proxy unless already starts with /api
+  const url = typeof window === 'undefined'
+    ? `${baseUrl}${cleanEndpoint}`
+    : (cleanEndpoint.startsWith('/api') ? cleanEndpoint : `/api${cleanEndpoint}`);
+  
+  const headers = new Headers(options.headers || {});
+  if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  const res = await fetch(url, { cache: 'no-store', ...options, headers });
+  
+  let data: ApiResponse<T>;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error('Failed to parse JSON response');
+  }
+
+  if (!res.ok || data.success === false) {
+    throw new Error(data.message || 'API request failed');
+  }
+
+  return data.data as T;
+}

@@ -1,0 +1,64 @@
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import authRoutes from "./routes/auth.routes";
+import categoryRoutes from "./routes/category.routes";
+import productRoutes from "./routes/product.routes";
+import brandRoutes from "./routes/brand.routes";
+import subcategoryRoutes from "./routes/subcategory.routes";
+import cartRoutes from "./routes/cart.routes";
+import wishlistRoutes from "./routes/wishlist.routes";
+import addressRoutes from "./routes/address.routes";
+import couponRoutes from "./routes/coupon.routes";
+import productReviewRoutes from "./routes/product_review.routes";
+import orderRoutes from "./routes/order.routes";
+import paymentRoutes from "./routes/payment.routes";
+import inventoryRoutes from "./routes/inventory.routes";
+import shipmentRoutes from "./routes/shipment.routes";
+import returnOrderRoutes from "./routes/return_order.routes";
+import bannerRoutes from "./routes/banner.routes";
+import homepageSectionRoutes from "./routes/homepage_section.routes";
+import offerRoutes from "./routes/offer.routes";
+import auditLogRoutes from "./routes/audit_log.routes";
+import userSessionRoutes from "./routes/user_session.routes";
+import mediaFileRoutes from "./routes/media_file.routes";
+import notificationRoutes from "./routes/notification.routes";
+import analyticsEventRoutes from "./routes/analytics_event.routes";
+import cjRoutes from "./routes/cj.routes";
+
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+app.use(cors());
+app.use(helmet());
+app.use(express.json());
+
+app.use("/api/auth", authRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/brands", brandRoutes);
+app.use("/api/subcategories", subcategoryRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/address", addressRoutes);
+app.use("/api/coupon", couponRoutes);
+app.use("/api/product-review", productReviewRoutes);
+app.use("/api/order", orderRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/shipment", shipmentRoutes);
+app.use("/api/return-order", returnOrderRoutes);
+app.use("/api/banner", bannerRoutes);
+app.use("/api/homepage-section", homepageSectionRoutes);
+app.use("/api/offer", offerRoutes);
+app.use("/api/audit-log", auditLogRoutes);
+app.use("/api/user-session", userSessionRoutes);
+app.use("/api/media-file", mediaFileRoutes);
+app.use("/api/notification", notificationRoutes);
+app.use("/api/analytics-event", analyticsEventRoutes);
+app.use("/api/cj", cjRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
