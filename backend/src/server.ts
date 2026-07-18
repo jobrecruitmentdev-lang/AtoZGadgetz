@@ -32,6 +32,7 @@ import analyticsEventRoutes from "./routes/analytics_event.routes.js";
 import cjRoutes from "./routes/cj.routes.js";
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 8080;
 
 // Hardening process exceptions
