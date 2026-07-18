@@ -3,6 +3,8 @@ import { fetchApi } from "@/lib/api-client";
 import { ProductsView } from "@/components/storefront/ProductsView";
 import { notFound } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
 export async function generateStaticParams() {
   return [
     { slug: 'under-99-gadgetz' },

@@ -2,6 +2,8 @@ import { RevealText } from "@/components/motion/RevealText";
 import { fetchApi } from "@/lib/api-client";
 import { ProductCard } from "@/components/storefront/ProductCard";
 
+export const dynamic = 'force-dynamic';
+
 export default async function WishlistPage() {
   let items = [];
   try {
