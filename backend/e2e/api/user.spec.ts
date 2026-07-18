@@ -51,8 +51,8 @@ test.describe('Authenticated User API Tests', () => {
     expect(body.success).toBe(true);
   });
 
-  test('GET /order should return user orders', async ({ request }) => {
-    const response = await request.get(`${API_URL}/order`, {
+  test('GET /order/mine should return user orders', async ({ request }) => {
+    const response = await request.get(`${API_URL}/order/mine`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     expect([200, 404]).toContain(response.status()); // 404 might mean no orders found, which is ok for a test user

@@ -1,6 +1,6 @@
 // e2e/api/test-data.ts
 
-export const API_URL = 'https://bukcsheet.atozgadgetz.com/api';
+export const API_URL = process.env.API_URL || 'http://127.0.0.1:8080/api';
 
 // Generate a random email so tests don't fail due to unique constraint if run repeatedly
 // Or use a static one but handle 400s safely. We'll use a semi-static one for the primary test user.
@@ -8,7 +8,7 @@ export const TEST_USER = {
   first_name: 'Test',
   last_name: 'UserE2E',
   email: `e2etest_${Date.now()}@atozgadgetz.com`, // using timestamp to ensure uniqueness per test run for registration test
-  mobile: `1234567890`,
+  mobile: `${Math.floor(1000000000 + Math.random() * 9000000000)}`,
   password: 'Password123!'
 };
 
