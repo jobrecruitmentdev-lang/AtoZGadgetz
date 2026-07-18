@@ -9,6 +9,7 @@ export function proxy(request: NextRequest) {
   if (pathname.startsWith('/account') || pathname.startsWith('/admin')) {
     if (!token) {
       const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('from', pathname);
       return NextResponse.redirect(loginUrl);
     }
   }
