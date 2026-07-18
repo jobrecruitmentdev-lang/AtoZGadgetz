@@ -7,10 +7,11 @@ async function handleProxy(request: NextRequest, { params }: { params: Promise<{
     const path = p.path.join('/');
     const url = new URL(request.url);
     
-    if (!process.env.API_URL && process.env.NODE_ENV === "production") {
+    if (!process.env.API_URL && !process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === "production") {
       console.warn("WARNING: API_URL is not set in production. Falling back to localhost, which will likely fail.");
     }
-    const backendUrl = `${process.env.API_URL || 'http://localhost:8080/api'}/${path}${url.search}`;
+    const baseUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+    const backendUrl = `${baseUrl}/${path}${url.search}`;
     
     const headers = new Headers(request.headers);
     headers.delete('host');
