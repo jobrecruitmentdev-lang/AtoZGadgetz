@@ -7,7 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "npx prisma generate && tsc -p tsconfig.json",
+    "build": "npx prisma generate && npx prisma db push --accept-data-loss && npx prisma db seed && tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "test:e2e": "playwright test"
