@@ -13,7 +13,7 @@ export async function fetchApi<T = unknown>(
 ): Promise<T> {
   // If running on the client, we always use the relative /api proxy
   const baseUrl = typeof window === 'undefined' 
-    ? (process.env.API_URL || 'http://127.0.0.1:8080/api') 
+    ? (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api') 
     : '';
 
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
