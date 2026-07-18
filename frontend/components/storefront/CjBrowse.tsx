@@ -17,7 +17,7 @@ export function CjBrowse({ keyword, initialPage = 1 }: CjBrowseProps) {
 
   const fetchOnce = async (kw: string, p: number) => {
     const res = await fetch(
-      `/api/cj/browse?keyword=${encodeURIComponent(kw)}&page=${p}&size=20`,
+      `/server-proxy/cj/browse?keyword=${encodeURIComponent(kw)}&page=${p}&size=20`,
       { cache: 'no-store' },
     );
     const json = await res.json();
