@@ -1,4 +1,4 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bukcsheet.atozgadgetz.com/api';
 
 export interface ApiResponse<T = unknown> {
   success?: boolean;
@@ -13,7 +13,7 @@ export async function fetchApi<T = unknown>(
 ): Promise<T> {
   // If running on the client, we always use the relative /api proxy
   const baseUrl = typeof window === 'undefined' 
-    ? (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080/api') 
+    ? (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://bukcsheet.atozgadgetz.com/api') 
     : '';
 
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;

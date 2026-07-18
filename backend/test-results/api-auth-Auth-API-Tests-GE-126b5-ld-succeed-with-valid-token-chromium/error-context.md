@@ -12,7 +12,10 @@
 # Error details
 
 ```
-TypeError: Cannot read properties of undefined (reading 'access_token')
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: 200
+Received: 503
 ```
 
 # Test source
@@ -82,8 +85,7 @@ TypeError: Cannot read properties of undefined (reading 'access_token')
   62 |       data: { email: STATIC_USER.email, password: STATIC_USER.password }
   63 |     });
   64 |     const loginBody = await loginResponse.json();
-> 65 |     const token = loginBody.data.access_token;
-     |                                  ^ TypeError: Cannot read properties of undefined (reading 'access_token')
+  65 |     const token = loginBody.data.access_token;
   66 | 
   67 |     // Use token
   68 |     const meResponse = await request.get(`${API_URL}/auth/me`, {
@@ -92,7 +94,8 @@ TypeError: Cannot read properties of undefined (reading 'access_token')
   71 |       }
   72 |     });
   73 |     
-  74 |     expect(meResponse.status()).toBe(200);
+> 74 |     expect(meResponse.status()).toBe(200);
+     |                                 ^ Error: expect(received).toBe(expected) // Object.is equality
   75 |     const meBody = await meResponse.json();
   76 |     expect(meBody.success).toBe(true);
   77 |     expect(meBody.data.email).toBe(STATIC_USER.email);
