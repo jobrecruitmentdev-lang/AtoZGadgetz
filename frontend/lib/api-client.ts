@@ -16,11 +16,14 @@ export async function fetchApi<T = unknown>(
     ? (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://bukcsheet.atozgadgetz.com/api') 
     : '';
 
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  // If it's relative client call, ensure it goes to /api/... proxy unless already starts with /api
+  let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  if (cleanEndpoint.startsWith('/api/')) {
+    cleanEndpoint = cleanEndpoint.substring(4);
+  }
+  // If it's relative client call, ensure it goes to /server-proxy/... proxy unless already starts with /server-proxy
   const url = typeof window === 'undefined'
     ? `${baseUrl}${cleanEndpoint}`
-    : (cleanEndpoint.startsWith('/api') ? cleanEndpoint : `/api${cleanEndpoint}`);
+    : (cleanEndpoint.startsWith('/server-proxy') ? cleanEndpoint : `/server-proxy${cleanEndpoint}`);
   
   const headers = new Headers(options.headers || {});
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
