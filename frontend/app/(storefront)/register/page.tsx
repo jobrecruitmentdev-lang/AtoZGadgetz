@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function RegisterPage() {
     try {
       await fetchApi('/api/auth/register', {
         method: 'POST',
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password })
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, email, mobile, password })
       });
       
       router.push('/login?registered=true');
@@ -72,6 +73,16 @@ export default function RegisterPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 rounded-md border border-gray-200 dark:border-gray-800 bg-background focus:outline-none focus:ring-2 focus:ring-accent"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Mobile</label>
+              <input
+                type="tel"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
                 className="w-full px-4 py-2 rounded-md border border-gray-200 dark:border-gray-800 bg-background focus:outline-none focus:ring-2 focus:ring-accent"
                 required
               />
