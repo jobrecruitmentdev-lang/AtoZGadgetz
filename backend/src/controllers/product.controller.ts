@@ -121,7 +121,7 @@ export const liveSearch = async (req: Request, res: Response) => {
 
 export const getRecommendations = async (req: Request, res: Response) => {
   try {
-    const { slug } = req.params;
+    const slug = String(req.params.slug || "");
     
     // 1. Get the current product
     const currentProduct = await prisma.product.findUnique({

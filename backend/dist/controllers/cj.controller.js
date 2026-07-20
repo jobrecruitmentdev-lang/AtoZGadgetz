@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { CjProductService } from '../services/cj/cj-product.service.js';
 import { CjOrderService } from '../services/cj/cj-order.service.js';
 import { CjShipmentService } from '../services/cj/cj-shipment.service.js';
+import { CjCategoryService } from '../services/cj/cj-category.service.js';
+import { CjInventoryService } from '../services/cj/cj-inventory.service.js';
 const prisma = new PrismaClient();
 export const searchCjProducts = async (req, res) => {
     try {
@@ -32,6 +34,29 @@ export const searchCjProducts = async (req, res) => {
             currency: p.currency || 'USD',
         }));
         res.json({ success: true, data: { list: normalized, total: raw?.totalRecords || normalized.length } });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const huntCjProducts = async (req, res) => {
+    try {
+        const keyword = String(req.query.keyword || '');
+        const minImages = Number(req.query.minImages || 3);
+        const page = Number(req.query.page || 1);
+        const size = Number(req.query.size || 20);
+        const raw = await CjProductService.huntProducts(keyword, minImages, page, size);
+        // Normalize the hunted products
+        const list = Array.isArray(raw?.list) ? raw.list : [];
+        const normalized = list.map((p) => ({
+            pid: p.id || p.pid || '',
+            name: p.nameEn || p.name || '',
+            imageUrl: p.bigImage || p.imageUrl || '',
+            price: parseFloat(p.sellPrice || p.nowPrice || p.price || '0'),
+            currency: p.currency || 'USD',
+            huntedImageCount: p.huntedImageCount || 1, // Will be > minImages if hunted successfully
+        }));
+        res.json({ success: true, data: { list: normalized, total: raw?.total || normalized.length } });
     }
     catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -127,6 +152,43 @@ export const autoImportCjProduct = async (req, res) => {
         }
         const product = await CjProductService.importProduct(cjPid, firstCat.id, firstSub.id, 2.0);
         res.status(201).json({ success: true, data: { productId: product.id } });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const getCjCategories = async (_req, res) => {
+    try {
+        const categories = await CjCategoryService.getCachedCategories();
+        res.json({ success: true, data: categories });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const syncCjCategories = async (_req, res) => {
+    try {
+        const result = await CjCategoryService.syncCategories();
+        res.json({ success: true, ...result });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const syncCjInventory = async (req, res) => {
+    try {
+        const productId = Number(req.params.productId);
+        const result = await CjInventoryService.syncProductInventory(productId);
+        res.json({ success: true, data: result });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const syncAllCjInventory = async (_req, res) => {
+    try {
+        const result = await CjInventoryService.syncAllInventory();
+        res.json({ success: true, ...result });
     }
     catch (error) {
         res.status(500).json({ success: false, message: error.message });

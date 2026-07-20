@@ -41,8 +41,8 @@ export const getOrderById = async (req, res) => {
 };
 export const placeOrder = async (req, res) => {
     try {
-        const { address_id, coupon_id } = createOrderSchema.parse(req.body);
-        const order = await service.placeOrder(req.user.id, address_id, coupon_id || null);
+        const payload = createOrderSchema.parse(req.body);
+        const order = await service.placeOrder(req.user?.id, payload);
         res
             .status(201)
             .json({

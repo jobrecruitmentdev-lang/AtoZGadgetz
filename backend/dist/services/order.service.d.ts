@@ -84,7 +84,7 @@ export declare class OrderService {
         created_at: Date;
         updated_at: Date;
     }) | null>;
-    placeOrder(userId: number, addressId: number, couponId: number | null): Promise<{
+    placeOrder(userId: number | undefined, payload: any): Promise<{
         id: number;
         order_number: string;
         user_id: number;

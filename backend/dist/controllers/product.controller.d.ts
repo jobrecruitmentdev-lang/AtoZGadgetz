@@ -4,4 +4,6 @@ export declare const createProduct: (req: Request, res: Response) => Promise<voi
 export declare const updateProduct: (req: Request, res: Response) => Promise<void>;
 export declare const deleteProduct: (req: Request, res: Response) => Promise<void>;
 export declare const getProductBySlug: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const liveSearch: (req: Request, res: Response) => Promise<void>;
+export declare const getRecommendations: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
 //# sourceMappingURL=product.controller.d.ts.map

@@ -36,6 +36,31 @@ export const authenticateJWT = async (req, res, next) => {
             .json({ success: false, message: "Authorization header missing" });
     }
 };
+export const optionalAuthenticateJWT = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(" ")[1];
+        if (!token)
+            return next();
+        jwt.verify(token, config.jwtSecret, { algorithms: ["HS256"] }, async (err, decoded) => {
+            if (err)
+                return next();
+            const user = await prisma.user.findUnique({
+                where: { id: decoded.sub },
+                include: {
+                    role: { include: { permissions: { include: { permission: true } } } },
+                },
+            });
+            if (user) {
+                req.user = user;
+            }
+            next();
+        });
+    }
+    else {
+        next();
+    }
+};
 export const authorizeRBAC = (requiredPermissions) => {
     return (req, res, next) => {
         const authReq = req;

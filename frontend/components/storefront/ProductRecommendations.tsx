@@ -49,7 +49,15 @@ export function ProductRecommendations({ currentSlug }: ProductRecommendationsPr
         className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"
       >
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard 
+            key={product.id} 
+            id={product.id.toString()}
+            slug={product.slug}
+            name={product.name}
+            price={parseFloat(product.price)}
+            image={product.thumbnail_image || (product.images && product.images[0] ? product.images[0].url : '/placeholder.svg')}
+            category={product.category?.name || 'Uncategorized'}
+          />
         ))}
       </motion.div>
     </div>

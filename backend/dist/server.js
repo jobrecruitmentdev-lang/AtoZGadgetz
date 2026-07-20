@@ -30,6 +30,7 @@ import notificationRoutes from "./routes/notification.routes.js";
 import analyticsEventRoutes from "./routes/analytics_event.routes.js";
 import cjRoutes from "./routes/cj.routes.js";
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 8080;
 // Hardening process exceptions
 process.on("unhandledRejection", (reason) => {
@@ -70,7 +71,7 @@ app.use("/api/", globalLimiter);
 // Auth Specific Rate Limiting
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 50,
+    max: process.env.NODE_ENV === 'production' ? 50 : 5000,
     message: "Too many login/register attempts, please try again later",
     standardHeaders: true,
     legacyHeaders: false,

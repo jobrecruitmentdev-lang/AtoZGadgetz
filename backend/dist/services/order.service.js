@@ -10,8 +10,8 @@ export class OrderService {
     async getById(id) {
         return repo.findById(id);
     }
-    async placeOrder(userId, addressId, couponId) {
-        return repo.placeOrder(userId, addressId, couponId);
+    async placeOrder(userId, payload) {
+        return repo.placeOrder(userId, payload);
     }
     async updateStatus(id, status, changedBy) {
         return repo.updateStatus(id, status, changedBy);

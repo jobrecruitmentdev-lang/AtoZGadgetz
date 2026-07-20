@@ -5,6 +5,13 @@ export declare class CjProductService {
      */
     static searchProducts(keyword: string, pageNum?: number, pageSize?: number): Promise<any>;
     /**
+     * Hunt for high-quality products by verifying image counts
+     */
+    static huntProducts(keyword: string, minImages?: number, pageNum?: number, pageSize?: number): Promise<{
+        list: any[];
+        total: any;
+    }>;
+    /**
      * Get product details by CJ Product ID
      */
     static getProductDetail(cjPid: string): Promise<any>;
