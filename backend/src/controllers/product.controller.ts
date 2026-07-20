@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ProductService } from "../services/product.service.js";
 import { createProductSchema } from "../validators/product.schema.js";
+import { prisma } from "../prisma.js";
 
 const productService = new ProductService();
 
@@ -98,7 +99,7 @@ export const liveSearch = async (req: Request, res: Response) => {
       take: 5,
     });
 
-    const list = products.map((p) => {
+    const list = products.map((p: any) => {
       let imageUrl = p.thumbnail_image;
       if (!imageUrl && p.images && p.images.length > 0) {
         imageUrl = p.images[0].url;

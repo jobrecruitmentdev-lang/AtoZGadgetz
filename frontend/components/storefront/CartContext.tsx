@@ -9,6 +9,7 @@ export interface CartItem {
   product_id: number;
   variant_id: number | null;
   quantity: number;
+  price?: number | string;
   product?: Record<string, unknown>;
   variant?: Record<string, unknown>;
 }
