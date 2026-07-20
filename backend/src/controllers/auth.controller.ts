@@ -46,6 +46,9 @@ export const login = async (req: Request, res: Response) => {
 
 export const me = async (req: any, res: Response) => {
   const user = req.user;
+  if (!user) {
+    return res.json({ success: true, message: "No active session", data: null });
+  }
   const { password_hash, ...userProfile } = user;
   res.json({ success: true, message: "Profile fetched", data: userProfile });
 };

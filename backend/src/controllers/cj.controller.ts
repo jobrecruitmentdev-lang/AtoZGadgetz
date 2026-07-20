@@ -63,7 +63,7 @@ export const huntCjProducts = async (req: Request, res: Response) => {
 
     res.json({ success: true, data: { list: normalized, total: raw?.total || normalized.length } });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(200).json({ success: false, message: error.message, data: { list: [], total: 0 } });
   }
 };
 

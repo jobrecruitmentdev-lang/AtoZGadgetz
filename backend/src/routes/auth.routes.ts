@@ -7,13 +7,13 @@ import {
   forgotPassword,
   resetPassword,
 } from "../controllers/auth.controller.js";
-import { authenticateJWT } from "../middlewares/auth.middleware.js";
+import { authenticateJWT, optionalAuthenticateJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.get("/me", authenticateJWT, me);
+router.get("/me", optionalAuthenticateJWT, me);
 router.post("/logout", authenticateJWT, logout);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
