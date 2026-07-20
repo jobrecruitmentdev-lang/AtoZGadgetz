@@ -51,11 +51,10 @@ export const getOrderById = async (req: Request, res: Response) => {
 
 export const placeOrder = async (req: Request, res: Response) => {
   try {
-    const { address_id, coupon_id } = createOrderSchema.parse(req.body);
+    const payload = createOrderSchema.parse(req.body);
     const order = await service.placeOrder(
-      req.user!.id,
-      address_id,
-      coupon_id || null,
+      req.user?.id,
+      payload
     );
     res
       .status(201)

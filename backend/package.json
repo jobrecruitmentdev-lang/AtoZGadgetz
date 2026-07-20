@@ -10,7 +10,8 @@
     "build": "npx prisma generate && npx prisma db push --accept-data-loss && npx prisma db seed && tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:clean": "tsx scripts/clean-db.ts"
   },
   "keywords": [],
   "author": "",

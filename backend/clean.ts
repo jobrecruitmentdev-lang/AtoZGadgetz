@@ -1,0 +1,1 @@
+import { PrismaClient } from '@prisma/client'; const prisma = new PrismaClient(); async function clean() { await prisma.category.deleteMany({ where: { name: { contains: '<script>' } } }); await prisma.productReview.deleteMany({ where: { review: { contains: '<script>' } } }); console.log('Cleanup done'); process.exit(0); } clean();

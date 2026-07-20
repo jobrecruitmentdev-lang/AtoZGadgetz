@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
-import Image from 'next/image';
-import { ShoppingCart, Loader2, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+import { SafeImage } from '@/components/ui/SafeImage';
+import { ShoppingCart, Loader2 } from 'lucide-react';
 import { fetchApi } from '@/lib/api-client';
 import { useCart } from '@/components/storefront/CartContext';
 
@@ -43,11 +44,15 @@ export function CjProductGrid({ products }: { products: CjProduct[] }) {
     }
   };
 
-  if (!products.length) return null;
+  const unique = products
+    .filter((p) => p.imageUrl && p.imageUrl.trim() !== '')
+    .filter((p, i, arr) => arr.findIndex((x) => x.pid === p.pid) === i);
+
+  if (!unique.length) return null;
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-      {products.map((product) => {
+      {unique.map((product) => {
         const price = typeof product.price === 'number'
           ? product.price
           : parseFloat(String(product.price || 0));
@@ -59,31 +64,24 @@ export function CjProductGrid({ products }: { products: CjProduct[] }) {
             key={product.pid}
             className="group bg-background border border-foreground/8 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
           >
-            <div className="relative aspect-square bg-foreground/3 overflow-hidden">
-              <Image
-                src={product.imageUrl || '/placeholder.svg'}
-                alt={product.name}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              />
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <a
-                  href={`https://www.cjdropshipping.com/product/${product.pid}.html`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center w-8 h-8 rounded-full bg-white/90 text-foreground hover:text-accent shadow-sm transition-colors"
-                  title="View on CJ"
-                >
-                  <ExternalLink size={13} />
-                </a>
+            <Link href={`/product/cj-${product.pid}`} className="block">
+              <div className="relative aspect-square bg-foreground/3 overflow-hidden">
+                <SafeImage
+                  src={product.imageUrl || '/placeholder.svg'}
+                  alt={product.name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                />
               </div>
-            </div>
+            </Link>
 
             <div className="p-3">
-              <h3 className="text-sm font-medium leading-snug line-clamp-2 mb-2 min-h-[2.5rem]">
-                {product.name}
-              </h3>
+              <Link href={`/product/cj-${product.pid}`}>
+                <h3 className="text-sm font-medium leading-snug line-clamp-2 mb-2 min-h-[2.5rem] hover:text-accent transition-colors">
+                  {product.name}
+                </h3>
+              </Link>
               <div className="flex items-center justify-between gap-2">
                 <span className="font-bold text-base text-accent">${(price * 2).toFixed(2)}</span>
                 <button

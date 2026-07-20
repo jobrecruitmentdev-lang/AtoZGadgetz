@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'api.atozgadgetz.com' },
       { protocol: 'https', hostname: 'cc-west-usa.oss-accelerate.aliyuncs.com' },
       { protocol: 'https', hostname: 'cc-west-usa.oss-us-west-1.aliyuncs.com' },
+      { protocol: 'https', hostname: 'cf.cjdropshipping.com' },
+      { protocol: 'https', hostname: '**.cjdropshipping.com' },
     ],
   },
 };

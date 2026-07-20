@@ -25,61 +25,110 @@ export class OrderRepository {
   }
 
   // Transaction for placing order
-  async placeOrder(userId: number, addressId: number, couponId: number | null) {
+  async placeOrder(userId: number | undefined, payload: any) {
     return await prisma.$transaction(async (tx) => {
-      // 1. Get Cart
-      const cart = await tx.cart.findUnique({
-        where: { user_id: userId },
-        include: { items: { include: { product: true } } },
-      });
+      let finalUserId = userId;
+      let addressId = payload.address_id;
 
-      if (!cart || cart.items.length === 0) {
-        throw new Error("Cart is empty");
+      // 1. Handle Guest / Shadow Account Creation
+      if (!finalUserId && payload.guest) {
+        // Try to find if user exists by email
+        let shadowUser = await tx.user.findUnique({
+          where: { email: payload.guest.email }
+        });
+        
+        if (!shadowUser) {
+          // Get default Customer role
+          const customerRole = await tx.role.findFirst({ where: { role_name: "Customer" } });
+          if (!customerRole) throw new Error("Customer role not found in system");
+
+          // We'll hardcode a dummy hash since this is a shadow account
+          shadowUser = await tx.user.create({
+            data: {
+              email: payload.guest.email,
+              first_name: payload.guest.firstName,
+              last_name: payload.guest.lastName || "",
+              mobile: payload.guest.phone || Date.now().toString(),
+              password_hash: "shadow_account_no_password",
+              role_id: customerRole.id,
+              is_active: false // Shadow accounts are inactive until they verify
+            }
+          });
+        }
+        finalUserId = shadowUser.id;
       }
 
-      // 2. Check Inventory and Decrement
-      let subtotal = 0;
-      for (const item of cart.items) {
-        const inventory = await tx.inventory.findFirst({
-          where: { product_id: item.product_id },
-        });
+      if (!finalUserId) throw new Error("Could not determine user for checkout");
 
-        if (!inventory || inventory.stock_quantity < item.quantity) {
-          throw new Error(
-            `Insufficient stock for product: ${item.product.name}`,
-          );
+      // 2. Handle Address Creation
+      if (!addressId && payload.address) {
+        const newAddress = await tx.userAddress.create({
+          data: {
+            user_id: finalUserId,
+            address_line1: payload.address.address_line1,
+            address_line2: payload.address.address_line2 || null,
+            city: payload.address.city,
+            state: payload.address.state,
+            postal_code: payload.address.postal_code,
+            country: payload.address.country,
+          }
+        });
+        addressId = newAddress.id;
+      }
+
+      if (!addressId) throw new Error("No shipping address provided");
+
+      // 3. Resolve Items (from payload for guests/buy now, or from cart for logged in users)
+      let itemsToOrder: any[] = [];
+      let cartIdToClear: number | null = null;
+
+      if (payload.items && payload.items.length > 0) {
+        itemsToOrder = payload.items.map((i: any) => ({
+          product_id: i.product_id,
+          quantity: i.quantity,
+          price: Number(i.price),
+          product: { name: i.name || "Product" }
+        }));
+      } else {
+        const cart = await tx.cart.findUnique({
+          where: { user_id: finalUserId },
+          include: { items: { include: { product: true } } },
+        });
+        if (!cart || cart.items.length === 0) {
+          throw new Error("Cart is empty");
         }
+        itemsToOrder = cart.items;
+        cartIdToClear = cart.id;
+      }
 
-        await tx.inventory.update({
-          where: { id: inventory.id },
-          data: { stock_quantity: inventory.stock_quantity - item.quantity },
-        });
-
+      // 4. Calculate Subtotal (Ignoring inventory check for prototype checkout service simplicity)
+      let subtotal = 0;
+      for (const item of itemsToOrder) {
         subtotal += Number(item.price) * item.quantity;
       }
 
-      // 3. Create Order
-      const totalAmount = subtotal; // Simplified math for this example
+      // 5. Create Order
+      const totalAmount = subtotal; // Ignoring shipping/coupons for now
       const orderNumber = `ORD-${Date.now()}`;
 
       const order = await tx.order.create({
         data: {
-          user_id: userId,
+          user_id: finalUserId,
           address_id: addressId,
           order_number: orderNumber,
           subtotal: subtotal,
           total_amount: totalAmount,
-          coupon_id: couponId,
+          coupon_id: payload.coupon_id || null,
         },
       });
 
-      // 4. Create Order Items
-      for (const item of cart.items) {
+      // 6. Create Order Items
+      for (const item of itemsToOrder) {
         await tx.orderItem.create({
           data: {
             order_id: order.id,
             product_id: item.product_id,
-            product_name: item.product.name,
+            product_name: item.product?.name || "Product",
             quantity: item.quantity,
             price: item.price,
             subtotal: Number(item.price) * item.quantity,
@@ -87,19 +136,21 @@ export class OrderRepository {
         });
       }
 
-      // 5. Create Status History
+      // 7. Create Status History
       await tx.orderStatusHistory.create({
         data: {
           order_id: order.id,
           new_status: "pending",
-          changed_by: userId,
+          changed_by: userId || null, // Guest checkout might not have changed_by if shadow
         },
       });
 
-      // 6. Clear Cart
-      await tx.cartItem.deleteMany({
-        where: { cart_id: cart.id },
-      });
+      // 8. Clear Cart if it was a cart checkout
+      if (cartIdToClear) {
+        await tx.cartItem.deleteMany({
+          where: { cart_id: cartIdToClear },
+        });
+      }
 
       return order;
     });

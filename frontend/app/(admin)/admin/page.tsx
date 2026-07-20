@@ -15,7 +15,7 @@ export default function AdminDashboard() {
     const loadDashboard = async () => {
       try {
         const [orders, products] = await Promise.all([
-          fetchApi<any[]>('/api/orders'),
+          fetchApi<any[]>('/api/order'),
           fetchApi<any[]>('/api/products')
         ]);
 

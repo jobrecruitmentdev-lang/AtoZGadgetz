@@ -9,7 +9,7 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchApi<any[]>('/api/orders').then(res => {
+    fetchApi<any[]>('/api/order').then(res => {
       setOrders(Array.isArray(res) ? res : []);
       setLoading(false);
     }).catch(e => {

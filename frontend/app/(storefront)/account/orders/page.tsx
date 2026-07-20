@@ -10,7 +10,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchApi<any[]>('/api/orders/mine').then(data => {
+    fetchApi<any[]>('/api/order/mine').then(data => {
       setOrders(Array.isArray(data) ? data : []);
       setLoading(false);
     }).catch(e => {

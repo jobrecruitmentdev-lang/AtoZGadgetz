@@ -8,11 +8,11 @@ export default defineConfig({
   workers: 1, // Single worker to be "humanly" slow and avoid hitting server limits
   reporter: 'html',
   use: {
-    baseURL: 'https://atozgadgetz.com',
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     // Slow down interactions to emulate human speed and reduce server load
     launchOptions: {
-      slowMo: 1000, 
+      slowMo: 0, 
     },
   },
 

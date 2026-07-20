@@ -12,7 +12,7 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
   const [statusUpdating, setStatusUpdating] = useState(false);
 
   const loadOrder = () => {
-    fetchApi<any>(`/api/orders/${id}`).then(res => {
+    fetchApi<any>(`/api/order/${id}`).then(res => {
       setOrder(res);
       setLoading(false);
     }).catch(e => {
@@ -28,7 +28,7 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
   const updateStatus = async (newStatus: string) => {
     setStatusUpdating(true);
     try {
-      await fetchApi(`/api/orders/${id}/status`, {
+      await fetchApi(`/api/order/${id}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status: newStatus })
       });

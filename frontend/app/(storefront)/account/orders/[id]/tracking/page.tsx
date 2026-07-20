@@ -45,7 +45,7 @@ export default function TrackingPage({ params }: { params: Promise<{ id: string 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchApi<TrackingData>(`/api/orders/${id}/tracking`)
+    fetchApi<TrackingData>(`/api/order/${id}/tracking`)
       .then(setTracking)
       .catch((e) => setError(e.message || 'Failed to load tracking'))
       .finally(() => setLoading(false));

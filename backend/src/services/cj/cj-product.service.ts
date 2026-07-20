@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { CjAuthService } from './cj-auth.service.js';
 import { cjHttp } from './cj-http.js';
 import { v4 as uuidv4 } from 'uuid';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../prisma.js';
 
 export class CjProductService {
   private static readonly API_BASE_URL = process.env.CJ_API_BASE_URL || 'https://developers.cjdropshipping.com/api2.0/v1';
@@ -28,6 +26,53 @@ export class CjProductService {
       console.error('CJ Search Error:', error.response?.data || error.message);
       throw new Error('Failed to search CJ products.');
     }
+  }
+
+  /**
+   * Hunt for high-quality products by verifying image counts
+   */
+  static async huntProducts(keyword: string, minImages: number = 3, pageNum = 1, pageSize = 20) {
+    // 1. Get raw search results
+    const searchData = await this.searchProducts(keyword, pageNum, pageSize);
+    if (!searchData || !searchData.list || searchData.list.length === 0) {
+      return { list: [], total: 0 };
+    }
+
+    const rawList = searchData.list;
+    const premiumProducts: any[] = [];
+
+    // 2. Fetch details for each product concurrently to check image counts
+    // Using a chunked promise approach to avoid hitting rate limits too hard if pageSize is large
+    const chunkSize = 5;
+    for (let i = 0; i < rawList.length; i += chunkSize) {
+      const chunk = rawList.slice(i, i + chunkSize);
+      const detailPromises = chunk.map(async (product: any) => {
+        try {
+          const detail = await this.getProductDetail(product.pid || product.id);
+          // If the product has enough images, attach the image count to the response
+          if (detail && detail.productImages && detail.productImages.length >= minImages) {
+            return {
+              ...product,
+              huntedImageCount: detail.productImages.length,
+            };
+          }
+        } catch (err) {
+          // Ignore individual detail fetch failures to not break the whole batch
+          console.error(`Failed to fetch details for ${product.pid} during hunt:`, err);
+        }
+        return null;
+      });
+
+      const results = await Promise.all(detailPromises);
+      for (const res of results) {
+        if (res) premiumProducts.push(res);
+      }
+    }
+
+    return {
+      list: premiumProducts,
+      total: searchData.total, // Original total results, not filtered total
+    };
   }
 
   /**

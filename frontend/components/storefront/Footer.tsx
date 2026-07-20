@@ -49,8 +49,8 @@ export function Footer() {
               <li><Link href="/products" className="hover:text-accent transition-colors">All Products</Link></li>
               <li><Link href="/category/electronics" className="hover:text-accent transition-colors">Electronics</Link></li>
               <li><Link href="/category/home-kitchen" className="hover:text-accent transition-colors">Home & Kitchen</Link></li>
-              <li><Link href="/category/beauty" className="hover:text-accent transition-colors">Beauty</Link></li>
-              <li><Link href="/category/health" className="hover:text-accent transition-colors">Health & Sports</Link></li>
+              <li><Link href="/category/smart-home" className="hover:text-accent transition-colors">Smart Home</Link></li>
+              <li><Link href="/category/gaming" className="hover:text-accent transition-colors">Gaming</Link></li>
               <li><Link href="/limited-time-offers" className="hover:text-accent transition-colors">Limited Time Offers</Link></li>
             </ul>
           </div>

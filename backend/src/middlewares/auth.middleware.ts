@@ -56,6 +56,35 @@ export const authenticateJWT = async (
   }
 };
 
+export const optionalAuthenticateJWT = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+    if (!token) return next();
+    jwt.verify(token, config.jwtSecret, { algorithms: ["HS256"] }, async (err, decoded: any) => {
+      if (err) return next();
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.sub },
+        include: {
+          role: { include: { permissions: { include: { permission: true } } } },
+        },
+      });
+
+      if (user) {
+        (req as AuthRequest).user = user;
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+};
+
 export const authorizeRBAC = (requiredPermissions: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const authReq = req as AuthRequest;

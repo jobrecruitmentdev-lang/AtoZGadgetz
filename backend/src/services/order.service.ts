@@ -15,8 +15,8 @@ export class OrderService {
     return repo.findById(id);
   }
 
-  async placeOrder(userId: number, addressId: number, couponId: number | null) {
-    return repo.placeOrder(userId, addressId, couponId);
+  async placeOrder(userId: number | undefined, payload: any) {
+    return repo.placeOrder(userId, payload);
   }
   async updateStatus(id: number, status: string, changedBy: number) {
     return repo.updateStatus(id, status, changedBy);

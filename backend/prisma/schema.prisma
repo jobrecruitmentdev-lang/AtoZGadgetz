@@ -709,6 +709,17 @@ model CjProduct {
   product_id Int?     @unique
 }
 
+model CjCategory {
+  id                  Int      @id @default(autoincrement())
+  cj_category_id      String   @unique
+  parent_cj_category_id String?
+  name                String   @db.VarChar(150)
+  level               Int      // 1 = first-level, 2 = second-level, 3 = third-level
+  synced_at           DateTime @updatedAt
+
+  @@map("cj_categories")
+}
+
 model CjOrder {
   id          String   @id @default(uuid())
   cj_order_id String   @unique

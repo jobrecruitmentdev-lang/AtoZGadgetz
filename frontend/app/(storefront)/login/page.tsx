@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api-client';
 import { RevealOnScroll } from '@/components/motion/RevealOnScroll';
 import { MagneticButton } from '@/components/motion/MagneticButton';
+import { useAuth } from '@/components/auth/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { refreshUser } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +26,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password })
       });
       
+      await refreshUser();
       router.push('/account');
       router.refresh();
     } catch (err: any) {

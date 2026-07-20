@@ -13,7 +13,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchApi(`/api/orders/${id}`).then(data => {
+    fetchApi(`/api/order/${id}`).then(data => {
       setOrder(data);
       setLoading(false);
     }).catch(e => {

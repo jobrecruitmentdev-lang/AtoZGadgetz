@@ -9,6 +9,7 @@ import {
 import { syncShipment } from "../controllers/cj.controller.js";
 import {
   authenticateJWT,
+  optionalAuthenticateJWT,
   requireAdminOrSuperAdmin,
 } from "../middlewares/auth.middleware.js";
 
@@ -18,7 +19,7 @@ const router = Router();
 router.get("/", authenticateJWT, requireAdminOrSuperAdmin, getAllOrders);
 router.get("/mine", authenticateJWT, getMyOrders);
 router.get("/:id", authenticateJWT, getOrderById);
-router.post("/place", authenticateJWT, placeOrder);
+router.post("/place", optionalAuthenticateJWT, placeOrder);
 router.patch(
   "/:id/status",
   authenticateJWT,

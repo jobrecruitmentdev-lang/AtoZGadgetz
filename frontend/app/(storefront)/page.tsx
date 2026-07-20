@@ -7,35 +7,33 @@ import { ProductCard } from "@/components/storefront/ProductCard";
 import Link from "next/link";
 import { fetchApi } from "@/lib/api-client";
 import {
-  Smartphone, Home as HomeIcon, Car, Sparkles, HeartPulse, Dumbbell,
-  PawPrint, Briefcase, Watch, Baby, Gamepad2, Leaf, Star,
+  Smartphone, Home as HomeIcon, Car, Headphones, Camera,
+  Laptop, Watch, Gamepad2, Zap, Wifi, Star,
   ShieldCheck, RotateCcw, Truck, CreditCard, Award, Globe
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "AtoZ Gadgetz — Shop Gadgets Worldwide | Electronics, Home & Kitchen, Beauty",
+  title: "AtoZ Gadgetz — Shop Gadgets Worldwide | Electronics, Smart Home & Tech",
   description:
-    "Shop trending gadgets at AtoZ Gadgetz — free worldwide shipping on qualifying orders. Electronics, home gadgets, beauty tools and 1,000+ products. 100% trusted. Fast delivery.",
+    "Shop trending gadgets at AtoZ Gadgetz — free worldwide shipping on qualifying orders. Electronics, smart home devices, gaming gear and 1,000+ hardware products. 100% trusted. Fast delivery.",
   openGraph: {
     title: "AtoZ Gadgetz — Shop Gadgets Worldwide",
-    description: "1,000+ curated gadgets. Electronics, home, beauty, fitness & more. Free shipping. 7-day exchange. Secure checkout.",
+    description: "1,000+ curated gadgets. Electronics, smart home, gaming, cameras & more. Free shipping. 7-day exchange. Secure checkout.",
     type: "website",
   },
 };
 
 const CATEGORIES = [
-  { name: "Electronics", slug: "electronics", icon: Smartphone, color: "from-blue-500/20 to-blue-600/10", border: "border-blue-200 dark:border-blue-800" },
-  { name: "Home & Kitchen", slug: "home-kitchen", icon: HomeIcon, color: "from-orange-500/20 to-orange-600/10", border: "border-orange-200 dark:border-orange-800" },
-  { name: "Automotive", slug: "automotive", icon: Car, color: "from-slate-500/20 to-slate-600/10", border: "border-slate-200 dark:border-slate-800" },
-  { name: "Beauty", slug: "beauty", icon: Sparkles, color: "from-pink-500/20 to-pink-600/10", border: "border-pink-200 dark:border-pink-800" },
-  { name: "Health", slug: "health", icon: HeartPulse, color: "from-red-500/20 to-red-600/10", border: "border-red-200 dark:border-red-800" },
-  { name: "Sports", slug: "sports", icon: Dumbbell, color: "from-green-500/20 to-green-600/10", border: "border-green-200 dark:border-green-800" },
-  { name: "Pet Supplies", slug: "pet-supplies", icon: PawPrint, color: "from-yellow-500/20 to-yellow-600/10", border: "border-yellow-200 dark:border-yellow-800" },
-  { name: "Office", slug: "office", icon: Briefcase, color: "from-indigo-500/20 to-indigo-600/10", border: "border-indigo-200 dark:border-indigo-800" },
-  { name: "Fashion", slug: "fashion", icon: Watch, color: "from-purple-500/20 to-purple-600/10", border: "border-purple-200 dark:border-purple-800" },
-  { name: "Baby", slug: "baby", icon: Baby, color: "from-sky-500/20 to-sky-600/10", border: "border-sky-200 dark:border-sky-800" },
-  { name: "Toys & Games", slug: "toys-games", icon: Gamepad2, color: "from-emerald-500/20 to-emerald-600/10", border: "border-emerald-200 dark:border-emerald-800" },
-  { name: "Garden", slug: "garden", icon: Leaf, color: "from-lime-500/20 to-lime-600/10", border: "border-lime-200 dark:border-lime-800" },
+  { name: "Electronics", slug: "electronics", icon: Smartphone },
+  { name: "Audio & Sound", slug: "audio", icon: Headphones },
+  { name: "Cameras", slug: "cameras", icon: Camera },
+  { name: "Laptops & PCs", slug: "laptops-pcs", icon: Laptop },
+  { name: "Smartwatches", slug: "smartwatches", icon: Watch },
+  { name: "Gaming", slug: "gaming", icon: Gamepad2 },
+  { name: "Smart Home", slug: "smart-home", icon: Wifi },
+  { name: "Car Accessories", slug: "car-accessories", icon: Car },
+  { name: "Mobile Accessories", slug: "mobile-accessories", icon: Zap },
+  { name: "Home Gadgets", slug: "home-gadgets", icon: HomeIcon },
 ] as const;
 
 const PRICE_RANGES = [
@@ -154,7 +152,7 @@ export default async function Home() {
         <RevealOnScroll delay={0.4}>
           <p className="text-xl md:text-2xl text-muted mb-10 max-w-2xl mx-auto leading-relaxed">
             Get all the gadgets under one Roof — 1,000+ curated products from Electronics
-            to Beauty, delivered worldwide.
+            to Smart Home devices, delivered worldwide.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <MagneticButton className="bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all duration-300 shadow-lg shadow-accent/25">
@@ -183,13 +181,13 @@ export default async function Home() {
       {/* ── Category Grid ── */}
       <section className="py-20 container mx-auto px-4 md:px-6">
         <RevealOnScroll>
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tighter mb-3">
-              Shop by Category
+          <div className="flex items-end justify-between mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+              Explore Categories
             </h2>
-            <p className="text-muted text-lg max-w-xl mx-auto">
-              From cutting-edge electronics to everyday essentials — find everything in one place.
-            </p>
+            <Link href="/products" className="text-sm font-medium text-muted hover:text-foreground hidden sm:block transition-colors">
+              View all →
+            </Link>
           </div>
         </RevealOnScroll>
 
@@ -200,12 +198,12 @@ export default async function Home() {
               <RevealOnScroll key={cat.slug} delay={idx * 0.05}>
                 <Link
                   href={`/category/${cat.slug}`}
-                  className={`group flex flex-col items-center gap-3 p-5 rounded-2xl bg-gradient-to-br ${cat.color} border ${cat.border} hover:scale-105 hover:shadow-lg transition-all duration-300 text-center`}
+                  className="group flex flex-col items-center justify-center gap-4 py-8 px-4 rounded-2xl bg-surface border border-black/5 dark:border-white/5 hover:border-black/20 dark:hover:border-white/20 hover:-translate-y-1 transition-all duration-300 text-center"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-white/60 dark:bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <Icon size={24} />
+                  <div className="w-14 h-14 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-foreground group-hover:bg-foreground group-hover:text-background transition-colors duration-300">
+                    <Icon size={24} strokeWidth={1.5} />
                   </div>
-                  <span className="font-semibold text-sm leading-tight">{cat.name}</span>
+                  <span className="font-medium text-sm tracking-wide">{cat.name}</span>
                 </Link>
               </RevealOnScroll>
             );

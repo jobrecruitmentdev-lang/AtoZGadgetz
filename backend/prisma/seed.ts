@@ -114,6 +114,26 @@ async function main() {
     },
   });
 
+  const mobileCategory = await prisma.category.upsert({
+    where: { slug: 'mobile-accessories' },
+    update: {},
+    create: {
+      name: 'Mobile Accessories',
+      slug: 'mobile-accessories',
+      description: 'Accessories for your mobile devices',
+    },
+  });
+
+  const powerbankSubcat = await prisma.subCategory.upsert({
+    where: { slug: 'power-banks' },
+    update: {},
+    create: {
+      name: 'Power Banks',
+      slug: 'power-banks',
+      category_id: mobileCategory.id,
+    },
+  });
+
   // 5. Products
   const product1 = await prisma.product.upsert({
     where: { slug: 'atoz-pro-wireless-earbuds' },
@@ -260,7 +280,36 @@ async function main() {
     },
   });
 
-  console.log('Products seeded.');
+  const product6 = await prisma.product.upsert({
+    where: { slug: 'atoz-fast-charger-65w' },
+    update: {},
+    create: {
+      name: 'AtoZ Fast Charger 65W',
+      slug: 'atoz-fast-charger-65w',
+      sku: 'ATOZ-CHARGER-65W',
+      price: 39.99,
+      discount_price: 29.99,
+      stock_quantity: 200,
+      description: 'Ultra-compact 65W GaN fast charger with 2 USB-C and 1 USB-A ports.',
+      short_description: '65W GaN Fast Charger',
+      category_id: mobileCategory.id,
+      subcategory_id: powerbankSubcat.id,
+      brand_id: brand.id,
+      created_by: admin.id,
+      is_featured: true,
+      thumbnail_image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?q=80&w=600&auto=format&fit=crop',
+      images: {
+        create: [
+          {
+            image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?q=80&w=600&auto=format&fit=crop',
+            sort_order: 1,
+          }
+        ]
+      }
+    },
+  });
+
+  console.log('Seed completed successfully.');
   console.log('Seeding finished.');
 }
 

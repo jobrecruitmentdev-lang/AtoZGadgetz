@@ -20,3 +20,9 @@ export const STATIC_USER = {
   mobile: '0987654321',
   password: 'Password123!'
 };
+
+// Seeded by prisma/seed.ts — role_id 1 (SuperAdmin), used for admin-only CJ routes
+export const ADMIN_USER = {
+  email: 'admin@atozgadgets.com',
+  password: 'admin123',
+};

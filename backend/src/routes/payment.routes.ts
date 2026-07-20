@@ -7,6 +7,7 @@ import {
 } from '../controllers/payment.controller.js';
 import {
   authenticateJWT,
+  optionalAuthenticateJWT,
   requireAdminOrSuperAdmin,
 } from '../middlewares/auth.middleware.js';
 
@@ -16,7 +17,7 @@ router.get('/', authenticateJWT, requireAdminOrSuperAdmin, getAllPayments);
 router.post('/', authenticateJWT, createPayment);
 
 // Razorpay gateway — authenticated customer endpoints
-router.post('/razorpay/create-order', authenticateJWT, razorpayCreateOrder);
-router.post('/razorpay/verify', authenticateJWT, razorpayVerify);
+router.post('/razorpay/create-order', optionalAuthenticateJWT, razorpayCreateOrder);
+router.post('/razorpay/verify', optionalAuthenticateJWT, razorpayVerify);
 
 export default router;

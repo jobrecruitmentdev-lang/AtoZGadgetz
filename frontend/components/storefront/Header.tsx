@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, Search, ShoppingCart, User, X, ChevronDown } from 'lucide-react';
+import { Menu, ShoppingCart, User, X, ChevronDown, Heart } from 'lucide-react';
+import { SearchBar } from '@/components/storefront/SearchBar';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CartDrawer } from '@/components/storefront/CartDrawer';
@@ -13,36 +14,30 @@ const NAV_CATEGORIES = [
   {
     label: 'Electronics',
     slug: 'electronics',
-    subs: ['Mobile Accessories', 'Laptop Accessories', 'Smart Home', 'Audio', 'Cameras', 'Gaming', 'Power Banks', 'Smartwatches', 'Chargers & Cables'],
+    subs: ['Mobile Accessories', 'Laptop Accessories', 'Chargers & Cables', 'Power Banks', 'Smartwatches', 'Cameras', 'Audio', 'Gaming'],
   },
   {
-    label: 'Home & Kitchen',
-    slug: 'home-kitchen',
-    subs: ['Kitchen Gadgets', 'Air Fryers', 'Blenders', 'Coffee Accessories', 'Storage', 'Cleaning Supplies', 'Home Decor', 'Lighting', 'Bathroom'],
+    label: 'Smart Home',
+    slug: 'smart-home',
+    subs: ['Smart Lighting', 'Smart Plugs', 'Security Cameras', 'Smart Speakers', 'Robot Vacuums', 'Smart Displays', 'Home Automation'],
   },
   {
-    label: 'Beauty',
-    slug: 'beauty',
-    subs: ['Skin Care', 'Hair Care', 'Grooming', 'Makeup', 'Nail Care', 'Beauty Tools', 'Personal Care', 'Wellness'],
-  },
-  {
-    label: 'Health & Sports',
-    slug: 'health',
-    subs: ['Fitness Equipment', 'Supplements', 'Massage', 'Yoga', 'Health Monitors', 'Cycling', 'Camping', 'Travel Gear'],
+    label: 'Home Gadgets',
+    slug: 'home-gadgets',
+    subs: ['Kitchen Gadgets', 'Air Fryers', 'Blenders', 'Coffee Accessories', 'Cleaning Gadgets', 'Lighting', 'Organisers'],
   },
   {
     label: 'More',
     slug: null,
     subs: [],
     megaLinks: [
-      { label: 'Automotive', slug: 'automotive' },
-      { label: 'Pet Supplies', slug: 'pet-supplies' },
-      { label: 'Office & Stationery', slug: 'office' },
-      { label: 'Fashion & Accessories', slug: 'fashion' },
-      { label: 'Baby', slug: 'baby' },
-      { label: 'Toys & Games', slug: 'toys-games' },
-      { label: 'Garden', slug: 'garden' },
-      { label: 'Seasonal', slug: 'seasonal' },
+      { label: 'Car Accessories', slug: 'car-accessories' },
+      { label: 'Gaming', slug: 'gaming' },
+      { label: 'Cameras', slug: 'cameras' },
+      { label: 'Audio & Sound', slug: 'audio' },
+      { label: 'Laptops & PCs', slug: 'laptops-pcs' },
+      { label: 'Office Tech', slug: 'office-tech' },
+      { label: 'Outdoor Gadgets', slug: 'outdoor-gadgets' },
     ],
   },
 ] as const;
@@ -58,11 +53,11 @@ const PRICE_LINKS = [
 export function Header() {
   const { user } = useAuth();
   const { cart } = useCart();
+  const wishlist: any[] = [];
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [openMega, setOpenMega] = useState<string | null>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const closeTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -76,7 +71,6 @@ export function Header() {
     setIsMobileMenuOpen(false);
     setIsCartOpen(false);
     setOpenMega(null);
-    setSearchOpen(false);
   }, [pathname]);
 
   const handleMouseEnter = (label: string) => {
@@ -104,10 +98,11 @@ export function Header() {
           Free worldwide shipping on orders over $30 · 7–15 day delivery · Secure checkout
         </div>
 
-        <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-14">
+        {/* Main Nav Row */}
+        <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-16 md:h-20 gap-4">
           {/* Mobile hamburger */}
           <button
-            className="md:hidden text-foreground w-11 h-11 inline-flex items-center justify-center rounded-lg hover:bg-foreground/5 transition-colors"
+            className="md:hidden text-foreground w-11 h-11 inline-flex items-center justify-center rounded-lg hover:bg-foreground/5 transition-colors shrink-0"
             onClick={() => setIsMobileMenuOpen(true)}
             aria-label="Open Menu"
           >
@@ -124,14 +119,56 @@ export function Header() {
               priority
               className="rounded-full invert dark:invert-0"
             />
-            <span className="font-bold text-lg tracking-tight hidden sm:block">AtoZ Gadgetz</span>
+            <span className="font-bold text-lg md:text-xl tracking-tight hidden sm:block">AtoZ Gadgetz</span>
           </Link>
 
-          {/* Desktop Mega Nav */}
-          <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
-            <Link href="/products" className="px-3 py-3 rounded-lg hover:bg-foreground/5 hover:text-accent transition-colors">
-              All Products
+          {/* Desktop Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-2xl mx-4 lg:mx-8">
+            <SearchBar />
+          </div>
+
+          {/* Right icons */}
+          <div className="flex items-center gap-3">
+            <Link
+              href={user ? '/account' : '/login'}
+              aria-label="Account"
+              className="w-11 h-11 inline-flex items-center justify-center rounded-lg text-foreground hover:text-accent hover:bg-foreground/5 transition-colors"
+            >
+              <User size={20} />
             </Link>
+            
+            <Link href="/wishlist" aria-label="Wishlist" className="relative w-11 h-11 inline-flex items-center justify-center rounded-lg text-foreground hover:text-accent hover:bg-foreground/5 transition-colors">
+              <Heart size={20} />
+              {wishlist.length > 0 && (
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full" />
+              )}
+            </Link>
+
+            <button onClick={() => setIsCartOpen(true)} aria-label="Cart" className="relative w-11 h-11 inline-flex items-center justify-center rounded-lg text-foreground hover:text-accent hover:bg-foreground/5 transition-colors">
+              <ShoppingCart size={20} />
+              {cartCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Search Bar Row */}
+        <div className="md:hidden border-t border-foreground/5 py-2 bg-background/50 backdrop-blur-md">
+          <div className="container mx-auto px-4 flex justify-center">
+            <SearchBar />
+          </div>
+        </div>
+
+        {/* Categories Row - Bottom */}
+        <div className="hidden md:block border-t border-foreground/5 py-1.5">
+          <div className="container mx-auto px-4 md:px-6">
+            <nav className="flex items-center justify-center gap-4 text-sm font-medium">
+              <Link href="/products" className="px-3 py-2 rounded-lg hover:bg-foreground/5 hover:text-accent transition-colors">
+                All Products
+              </Link>
 
             {NAV_CATEGORIES.map((cat) => (
               <div
@@ -238,56 +275,6 @@ export function Header() {
               </AnimatePresence>
             </div>
           </nav>
-
-          {/* Right icons */}
-          <div className="flex items-center gap-3">
-            <AnimatePresence>
-              {searchOpen && (
-                <motion.div
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: 200, opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  className="overflow-hidden hidden sm:block"
-                >
-                  <input
-                    autoFocus
-                    type="search"
-                    placeholder="Search gadgets..."
-                    className="w-full px-3 py-1.5 text-sm rounded-full border border-foreground/20 bg-background focus:outline-none focus:ring-2 focus:ring-accent/50"
-                    onBlur={() => setSearchOpen(false)}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <button
-              aria-label="Search"
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="w-11 h-11 inline-flex items-center justify-center rounded-lg text-foreground hover:text-accent hover:bg-foreground/5 transition-colors hidden sm:flex"
-            >
-              <Search size={20} />
-            </button>
-
-            <Link
-              href={user ? '/account' : '/login'}
-              aria-label="Account"
-              className="w-11 h-11 inline-flex items-center justify-center rounded-lg text-foreground hover:text-accent hover:bg-foreground/5 transition-colors"
-            >
-              <User size={20} />
-            </Link>
-
-            <button
-              onClick={() => setIsCartOpen(true)}
-              aria-label="Cart"
-              className="w-11 h-11 inline-flex items-center justify-center rounded-lg text-foreground hover:text-accent hover:bg-foreground/5 transition-colors relative"
-            >
-              <ShoppingCart size={20} />
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-accent text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </button>
           </div>
         </div>
       </header>
@@ -329,11 +316,7 @@ export function Header() {
               </div>
 
               <div className="mb-4">
-                <input
-                  type="search"
-                  placeholder="Search gadgets..."
-                  className="w-full px-4 py-2.5 text-sm rounded-full border border-foreground/20 bg-foreground/5 focus:outline-none focus:ring-2 focus:ring-accent/50"
-                />
+                <SearchBar />
               </div>
 
               <nav className="flex flex-col gap-1 text-sm font-medium flex-grow">

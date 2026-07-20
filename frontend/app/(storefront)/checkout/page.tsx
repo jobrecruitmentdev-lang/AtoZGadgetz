@@ -8,6 +8,7 @@ import { ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
 
 import { useCart } from '@/components/storefront/CartContext';
 import { fetchApi } from '@/lib/api-client';
+import { TrustBadges } from '@/components/storefront/TrustBadges';
 
 declare global {
   interface Window {
@@ -131,7 +132,7 @@ export default function CheckoutPage() {
     setError(null);
     try {
       // 1. Create the order in our DB first
-      const order = await fetchApi<{ id: number }>('/orders/place', {
+      const order = await fetchApi<{ id: number }>('/api/order/place', {
         method: 'POST',
         body: JSON.stringify({
           address: {
@@ -142,6 +143,18 @@ export default function CheckoutPage() {
             postal_code: form.postalCode,
             country: form.country,
           },
+          guest: {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            email: form.email,
+            phone: form.phone,
+          },
+          items: items.map((i) => ({
+            product_id: (i.product as any)?.id || i.product_id,
+            quantity: i.quantity,
+            price: (i.product as any)?.price || i.price,
+            name: (i.product as any)?.name || 'Product',
+          }))
         }),
       });
 
@@ -382,6 +395,10 @@ export default function CheckoutPage() {
             </div>
           </RevealOnScroll>
         </div>
+      </div>
+      
+      <div className="mt-12 max-w-4xl mx-auto">
+        <TrustBadges />
       </div>
     </div>
   );

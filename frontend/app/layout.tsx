@@ -18,19 +18,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://atozgadgetz.com'),
   title: {
-    default: "AtoZ Gadgetz — Shop Gadgets Worldwide | Electronics, Home, Beauty & More",
+    default: "AtoZ Gadgetz — Shop Gadgets Worldwide | Electronics, Smart Home & Tech Gadgets",
     template: "%s | AtoZ Gadgetz",
   },
   description:
-    "Shop trending gadgets at AtoZ Gadgetz. Electronics, home & kitchen, beauty tools, fitness gear and 1,000+ products. Free worldwide shipping on qualifying orders. 100% trusted.",
+    "Shop trending gadgets at AtoZ Gadgetz. Electronics, smart home devices, gaming gear, cameras and 1,000+ hardware products. Free worldwide shipping on qualifying orders. 100% trusted.",
   keywords: [
-    "gadgets", "AtoZ Gadgetz", "electronics", "home gadgets", "kitchen gadgets",
-    "beauty gadgets", "fitness gadgets", "smartwatches", "mobile accessories",
+    "gadgets", "AtoZ Gadgetz", "electronics", "smart home", "home gadgets", "kitchen gadgets",
+    "gaming gear", "smartwatches", "mobile accessories", "cameras", "tech gadgets",
     "buy gadgets online", "worldwide shipping", "affordable gadgets",
   ],
   openGraph: {
     title: "AtoZ Gadgetz — Shop Gadgets Worldwide",
-    description: "1,000+ curated gadgets. Electronics, home, beauty & more. Free shipping on qualifying orders. 100% trusted. Delivered worldwide.",
+    description: "1,000+ curated hardware gadgets. Electronics, smart home, gaming, cameras & more. Free shipping on qualifying orders. 100% trusted. Delivered worldwide.",
     siteName: "AtoZ Gadgetz",
     url: "https://atozgadgetz.com",
     locale: "en_US",

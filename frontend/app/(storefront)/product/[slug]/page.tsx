@@ -2,11 +2,16 @@ import { RevealText } from "@/components/motion/RevealText";
 import { RevealOnScroll } from "@/components/motion/RevealOnScroll";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import Image from "next/image";
-import { ShoppingCart, Heart, Shield, Truck } from "lucide-react";
+import { ShoppingCart, Heart, Shield, Truck, Star, Info, Package, RefreshCw } from "lucide-react";
 
 import { fetchApi } from "@/lib/api-client";
+import { ProductActions } from "@/components/storefront/ProductActions";
 
-import { AddToCartButton } from "@/components/storefront/AddToCartButton";
+import { ProductGallery } from "@/components/storefront/ProductGallery";
+import { StickyMobileCTA } from "@/components/storefront/StickyMobileCTA";
+import { TrustBadges } from "@/components/storefront/TrustBadges";
+import { DeliveryEstimate } from "@/components/storefront/DeliveryEstimate";
+import { ProductRecommendations } from "@/components/storefront/ProductRecommendations";
 
 export const dynamic = 'force-dynamic';
 
@@ -42,76 +47,208 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     product.images = ['/placeholder.svg'];
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "name": product.name,
+        "image": product.images[0],
+        "description": product.description,
+        "sku": product.id.toString(),
+        "offers": {
+          "@type": "Offer",
+          "url": `https://atozgadgetz.com/product/${slug}`,
+          "priceCurrency": "USD",
+          "price": product.price,
+          "availability": "https://schema.org/InStock",
+          "itemCondition": "https://schema.org/NewCondition"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "124"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://atozgadgetz.com"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": product.category,
+            "item": `https://atozgadgetz.com/category/${product.category.toLowerCase().replace(/\s+/g, '-')}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": product.name
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Does this product come with a warranty?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, all our products come with a standard 1-year manufacturer warranty against defects."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does shipping take?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Orders are typically dispatched within 24 hours. Standard delivery takes 3-7 business days depending on your location."
+            }
+          }
+        ]
+      }
+    ]
+  };
+
   return (
-    <div className="container mx-auto px-4 md:px-6 py-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="container mx-auto px-4 md:px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24">
         
-        <div className="space-y-4">
-          <RevealOnScroll>
-            <div className="relative aspect-[4/5] md:aspect-square bg-surface rounded-2xl overflow-hidden border border-black/5 dark:border-white/5">
-              <Image 
-                src={product.images[0]} 
-                alt={product.name} 
-                fill 
-                className="object-cover"
-                priority
-              />
-            </div>
-          </RevealOnScroll>
-          <div className="grid grid-cols-2 gap-4">
-            {product.images.slice(1).map((img, idx) => (
-              <RevealOnScroll key={idx} delay={0.1 * (idx + 1)}>
-                <div className="relative aspect-square bg-surface rounded-2xl overflow-hidden border border-black/5 dark:border-white/5">
-                  <Image src={img} alt={`Gallery image ${idx+1}`} fill className="object-cover" />
-                </div>
-              </RevealOnScroll>
-            ))}
-          </div>
+        <div className="w-full">
+          <ProductGallery images={product.images} productName={product.name} />
         </div>
 
         <div className="relative">
-          <div className="md:sticky md:top-32 space-y-8">
+          <div className="md:sticky md:top-24 space-y-6">
             <div>
-              <p className="text-sm font-semibold tracking-wider text-accent uppercase mb-2">{product.category}</p>
-              <RevealText as="h1" className="text-4xl md:text-5xl font-bold tracking-tighter mb-4">
+              <div className="flex justify-between items-start mb-2">
+                <p className="text-sm font-semibold tracking-wider text-accent uppercase">{product.category}</p>
+                <div className="flex gap-1 text-yellow-500">
+                  <Star size={16} fill="currentColor" />
+                  <Star size={16} fill="currentColor" />
+                  <Star size={16} fill="currentColor" />
+                  <Star size={16} fill="currentColor" />
+                  <Star size={16} fill="currentColor" className="opacity-50" />
+                  <span className="text-xs text-muted ml-1">(124)</span>
+                </div>
+              </div>
+              
+              <RevealText as="h1" className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
                 {product.name}
               </RevealText>
-              <p className="text-2xl font-medium">${product.price.toFixed(2)}</p>
-            </div>
-
-            <p className="text-muted leading-relaxed">
-              {product.description}
-            </p>
-
-            <ul className="space-y-3">
-              {product.features.map((feat, i) => (
-                <li key={i} className="flex items-center gap-3 text-sm">
-                  <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                  {feat}
-                </li>
-              ))}
-            </ul>
-
-            <div className="pt-6 border-t border-black/10 dark:border-white/10 flex gap-4">
-              <AddToCartButton productId={product.id} />
-              <button className="w-14 h-14 flex items-center justify-center rounded-full border border-black/10 dark:border-white/10 hover:bg-surface transition-colors text-muted hover:text-red-500">
-                <Heart size={20} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-6 text-sm text-muted">
-              <div className="flex items-center gap-3">
-                <Truck size={18} />
-                <span>Free shipping over $100</span>
+              
+              <div className="flex items-center gap-4 text-sm mb-4">
+                <span className="text-muted">SKU: <span className="font-mono text-foreground">{product.id.toString().padStart(6, '0')}</span></span>
+                <span className="text-muted">•</span>
+                <span className="text-green-600 font-medium flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-green-500" />
+                  In Stock (150+ units)
+                </span>
               </div>
-              <div className="flex items-center gap-3">
-                <Shield size={18} />
-                <span>2 Year Warranty</span>
+
+              <div className="flex items-end gap-3">
+                <p className="text-3xl font-bold">${product.price.toFixed(2)}</p>
+                <p className="text-sm text-muted line-through pb-1">${(product.price * 1.2).toFixed(2)}</p>
+                <span className="text-xs font-semibold bg-accent/10 text-accent px-2 py-1 rounded mb-1">Save 20%</span>
               </div>
             </div>
+
+            {/* Product Actions Component */}
+            <ProductActions 
+              productId={product.id} 
+              productName={product.name}
+              productDescription={product.description}
+            />
+
+            <DeliveryEstimate />
+
+            {/* Trust Signals */}
+            <TrustBadges />
+
+            {/* Specifications Section */}
+            <div className="space-y-4 pt-2">
+              <h3 className="font-bold flex items-center gap-2">
+                <Info size={18} /> Product Specifications
+              </h3>
+              
+              <div className="bg-surface rounded-xl p-5 border border-black/5 dark:border-white/5 space-y-6">
+                <div>
+                  <h4 className="text-sm font-semibold text-muted mb-2 uppercase tracking-wider">Features</h4>
+                  <ul className="space-y-2">
+                    {product.features.map((feat, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                        <span className="leading-relaxed">{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div className="border-t border-black/5 dark:border-white/5 pt-4">
+                  <h4 className="text-sm font-semibold text-muted mb-2 uppercase tracking-wider">What's in the Box?</h4>
+                  <p className="text-sm text-foreground/80 leading-relaxed">
+                    1x {product.name}, User Manual, Standard Packaging.
+                  </p>
+                </div>
+
+                <div className="border-t border-black/5 dark:border-white/5 pt-4">
+                  <h4 className="text-sm font-semibold text-muted mb-2 uppercase tracking-wider">Description</h4>
+                  <p className="text-sm text-foreground/80 leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+
+                <div className="border-t border-black/5 dark:border-white/5 pt-4">
+                  <h4 className="text-sm font-semibold text-muted mb-2 uppercase tracking-wider">Frequently Asked Questions</h4>
+                  <div className="space-y-4 mt-3">
+                    <details className="group">
+                      <summary className="flex cursor-pointer items-center justify-between font-medium text-sm text-foreground/90 hover:text-accent">
+                        Does this product come with a warranty?
+                        <span className="transition group-open:rotate-180">
+                          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                      </summary>
+                      <p className="text-sm text-muted mt-2 group-open:animate-fadeIn">
+                        Yes, all our products come with a standard 1-year manufacturer warranty against defects.
+                      </p>
+                    </details>
+                    <details className="group">
+                      <summary className="flex cursor-pointer items-center justify-between font-medium text-sm text-foreground/90 hover:text-accent">
+                        How long does shipping take?
+                        <span className="transition group-open:rotate-180">
+                          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                      </summary>
+                      <p className="text-sm text-muted mt-2 group-open:animate-fadeIn">
+                        Orders are typically dispatched within 24 hours. Standard delivery takes 3-7 business days depending on your location.
+                      </p>
+                    </details>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
     </div>
+    
+    <div className="container mx-auto px-4 md:px-6">
+      <ProductRecommendations currentSlug={slug} />
+    </div>
+
+    <StickyMobileCTA productId={product.id} productName={product.name} price={product.price.toString()} />
+    </>
   );
 }

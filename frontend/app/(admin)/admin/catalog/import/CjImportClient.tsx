@@ -11,6 +11,7 @@ interface CjProduct {
   sellPrice: number;
   productImage: string;
   categoryName: string;
+  huntedImageCount?: number;
 }
 
 interface ImportState {
@@ -29,6 +30,8 @@ export function CjImportClient({
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
   const [markup, setMarkup] = useState('2.0');
+  const [isHunterMode, setIsHunterMode] = useState(false);
+  const [minImages, setMinImages] = useState(3);
   const [searchError, setSearchError] = useState<string | null>(null);
 
   const selectedCat = categories.find((c) => String(c.id) === selectedCategory);
@@ -39,7 +42,11 @@ export function CjImportClient({
     setSearching(true);
     setSearchError(null);
     try {
-      const data = await fetchApi<{ list?: CjProduct[] }>(`/api/cj/products/search?keyword=${encodeURIComponent(keyword)}&page=1&size=20`);
+      const endpoint = isHunterMode
+        ? `/api/cj/products/hunt?keyword=${encodeURIComponent(keyword)}&page=1&size=20&minImages=${minImages}`
+        : `/api/cj/products/search?keyword=${encodeURIComponent(keyword)}&page=1&size=20`;
+      
+      const data = await fetchApi<{ list?: CjProduct[] }>(endpoint);
       setResults(data?.list || []);
     } catch (err: any) {
       setSearchError(err.message || 'Search failed');
@@ -120,25 +127,52 @@ export function CjImportClient({
       </div>
 
       {/* Search */}
-      <form onSubmit={handleSearch} className="flex gap-3">
-        <div className="flex-grow relative">
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Search CJ Dropshipping catalog (e.g. wireless earbuds, phone case, kitchen gadget)…"
-            className="w-full pl-11 pr-4 py-3 rounded-xl border border-foreground/20 bg-background focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm"
-          />
+      <form onSubmit={handleSearch} className="flex flex-col gap-4">
+        <div className="flex gap-3">
+          <div className="flex-grow relative">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="Search CJ Dropshipping catalog (e.g. wireless earbuds, phone case)…"
+              className="w-full pl-11 pr-4 py-3 rounded-xl border border-foreground/20 bg-background focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={searching}
+            className={`flex items-center gap-2 px-6 py-3 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 ${isHunterMode ? 'bg-amber-600 hover:bg-amber-700' : 'bg-accent hover:bg-accent/90'}`}
+          >
+            {searching ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
+            {isHunterMode ? 'Hunt Products' : 'Search'}
+          </button>
         </div>
-        <button
-          type="submit"
-          disabled={searching}
-          className="flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-xl font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50"
-        >
-          {searching ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
-          Search
-        </button>
+        
+        <div className="flex items-center gap-4 bg-amber-500/10 p-4 rounded-xl border border-amber-500/20">
+          <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-amber-600 dark:text-amber-500">
+            <input 
+              type="checkbox" 
+              checked={isHunterMode} 
+              onChange={(e) => setIsHunterMode(e.target.checked)}
+              className="rounded text-amber-600 focus:ring-amber-500 w-4 h-4"
+            />
+            Enable Hunter Mode
+          </label>
+          {isHunterMode && (
+            <div className="flex items-center gap-2 text-sm text-muted">
+              <span>Minimum Images:</span>
+              <input 
+                type="number" 
+                min="1" 
+                max="10" 
+                value={minImages} 
+                onChange={(e) => setMinImages(parseInt(e.target.value) || 3)}
+                className="w-16 px-2 py-1 rounded bg-background border border-foreground/20 text-center"
+              />
+            </div>
+          )}
+        </div>
       </form>
 
       {searchError && (
@@ -167,6 +201,11 @@ export function CjImportClient({
                       fill
                       className="object-contain p-3"
                     />
+                    {product.huntedImageCount && product.huntedImageCount > 1 && (
+                      <div className="absolute top-2 right-2 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+                        {product.huntedImageCount} Images
+                      </div>
+                    )}
                   </div>
                   <div className="p-4">
                     <p className="text-xs text-muted mb-1 truncate">{product.categoryName}</p>

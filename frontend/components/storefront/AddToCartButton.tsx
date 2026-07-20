@@ -5,7 +5,7 @@ import { fetchApi } from "@/lib/api-client";
 import { useCart } from "@/components/storefront/CartContext";
 import { useState } from "react";
 
-export function AddToCartButton({ productId }: { productId: string | number }) {
+export function AddToCartButton({ productId, quantity = 1 }: { productId: string | number, quantity?: number }) {
   const { refreshCart } = useCart();
   const [loading, setLoading] = useState(false);
 
@@ -14,7 +14,7 @@ export function AddToCartButton({ productId }: { productId: string | number }) {
     try {
       await fetchApi('/api/cart/add', {
         method: 'POST',
-        body: JSON.stringify({ product_id: Number(productId), quantity: 1 })
+        body: JSON.stringify({ product_id: Number(productId), quantity })
       });
       await refreshCart();
       // maybe open drawer? not required right now

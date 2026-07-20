@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Backend API Tests', () => {
-  // Use the API URL for these tests instead of the baseURL (UI)
-  const API_URL = 'https://bukcsheet.atozgadgetz.com';
+  // Root of the API server (not /api — /health and 404s are unprefixed routes).
+  // Defaults to local; override with BACKEND_ROOT_URL to point elsewhere.
+  const API_URL = process.env.BACKEND_ROOT_URL || 'http://127.0.0.1:8080';
 
   test('health endpoint should return status: ok', async ({ request }) => {
     const response = await request.get(`${API_URL}/health`);

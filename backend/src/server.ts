@@ -79,7 +79,7 @@ app.use("/api/", globalLimiter);
 // Auth Specific Rate Limiting
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 50,
+  max: process.env.NODE_ENV === 'production' ? 50 : 5000,
   message: "Too many login/register attempts, please try again later",
   standardHeaders: true,
   legacyHeaders: false,

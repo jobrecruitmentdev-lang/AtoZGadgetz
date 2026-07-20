@@ -51,11 +51,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   try {
     const pData = await fetchApi<{ data?: any[] } | any[]>('/products');
-    const allProducts = (Array.isArray(pData) ? pData : pData?.data || []).map((p: any) => ({
-      ...p,
-      image: p.thumbnail_image,
-      category: p.category?.name || 'Uncategorized',
-    }));
+    let allProducts = Array.isArray(pData) ? pData : pData?.data || [];
 
     if (slug === 'new') {
       products = [...allProducts].sort(
@@ -68,6 +64,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         (p: any) => p.category?.slug === slug || p.subcategory?.slug === slug,
       );
     }
+
+    products = products.map((p: any) => ({
+      ...p,
+      image: p.thumbnail_image,
+      category: p.category?.name || 'Uncategorized',
+    }));
 
     const cData = await fetchApi<{ data?: any[] } | any[]>('/categories');
     categories = Array.isArray(cData) ? cData : cData?.data || [];
@@ -134,7 +136,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               <p className="text-sm text-muted mb-6">Live catalog — add to cart to order</p>
             </div>
           )}
-          <CjBrowse keyword={keyword} />
+          <CjBrowse keyword={keyword} hideIfEmpty={products.length > 0} />
         </RevealOnScroll>
       </div>
     </>
