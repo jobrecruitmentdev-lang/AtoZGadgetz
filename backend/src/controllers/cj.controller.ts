@@ -13,30 +13,37 @@ export const searchCjProducts = async (req: Request, res: Response) => {
     const keyword = String(req.query.keyword || '');
     const page = Number(req.query.page || 1);
     const size = Number(req.query.size || 20);
-    const raw = await CjProductService.searchProducts(keyword, page, size);
+    const skip = (page - 1) * size;
 
-    // CJ listV2 wraps products inside content[0].productList — normalize to a flat list
-    let list: any[] = [];
-    if (Array.isArray(raw)) {
-      list = raw;
-    } else if (Array.isArray(raw?.list)) {
-      list = raw.list;
-    } else if (Array.isArray(raw?.content)) {
-      for (const group of raw.content) {
-        if (Array.isArray(group?.productList)) list.push(...group.productList);
-      }
-    }
+    const [products, total] = await prisma.$transaction([
+      prisma.product.findMany({
+        where: {
+          fulfillment_type: 'cj',
+          name: { contains: keyword },
+          is_active: true
+        },
+        skip,
+        take: size,
+        include: { cj_product: true }
+      }),
+      prisma.product.count({
+        where: {
+          fulfillment_type: 'cj',
+          name: { contains: keyword },
+          is_active: true
+        }
+      })
+    ]);
 
-    // Normalize each item to a stable shape the frontend CjBrowse expects
-    const normalized = list.map((p: any) => ({
-      pid:      p.id || p.pid || '',
-      name:     p.nameEn || p.name || '',
-      imageUrl: p.bigImage || p.imageUrl || '',
-      price:    parseFloat(p.sellPrice || p.nowPrice || p.price || '0'),
-      currency: p.currency || 'USD',
+    const normalized = products.map((p: any) => ({
+      pid: p.cj_product?.cj_pid || p.sku,
+      name: p.name,
+      imageUrl: p.thumbnail_image || '',
+      price: Number(p.price),
+      currency: 'USD'
     }));
 
-    res.json({ success: true, data: { list: normalized, total: raw?.totalRecords || normalized.length } });
+    res.json({ success: true, data: { list: normalized, total } });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }

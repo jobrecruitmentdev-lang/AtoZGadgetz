@@ -30,6 +30,8 @@ import mediaFileRoutes from "./routes/media_file.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import analyticsEventRoutes from "./routes/analytics_event.routes.js";
 import cjRoutes from "./routes/cj.routes.js";
+import { initQueue } from "./workers/queue.js";
+import { startWorkers } from "./workers/sync.worker.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -127,6 +129,13 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.info(`Server is running on port ${PORT}`);
+  
+  try {
+    await initQueue();
+    await startWorkers();
+  } catch (err) {
+    logger.error("Failed to start background queue/workers:", err);
+  }
 });
