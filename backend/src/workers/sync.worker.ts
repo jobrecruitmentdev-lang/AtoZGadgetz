@@ -1,31 +1,31 @@
-import { getQueue } from './queue.js';
+import cron from 'node-cron';
 import { CjSyncService } from '../services/cj/cj-sync.service.js';
-import type { Job } from 'pg-boss';
 
-export const JOB_SYNC_CJ_PRODUCTS = 'sync-cj-products';
+let isSyncing = false;
 
 export const startWorkers = async () => {
-  const boss = getQueue();
+  console.log('[Worker] Initializing node-cron background workers.');
 
-  // Register worker for full CJ catalog sync
-  await boss.work(JOB_SYNC_CJ_PRODUCTS, async (jobs: Job[]) => {
-    for (const job of jobs) {
-      console.log(`[Worker] Processing job ${job.id}: ${job.name}`);
-      try {
-        await CjSyncService.syncAllCategories(2);
-        console.log(`[Worker] Job ${job.id} completed successfully.`);
-      } catch (error) {
-        console.error(`[Worker] Job ${job.id} failed:`, error);
-        throw error;
-      }
+  const runSync = async () => {
+    if (isSyncing) {
+      console.log('[Worker] Sync is already running. Skipping.');
+      return;
     }
-  });
-
-  console.log('[Worker] Registered background workers.');
+    isSyncing = true;
+    try {
+      console.log('[Worker] Starting CJ Products Sync...');
+      await CjSyncService.syncAllCategories(2);
+      console.log('[Worker] Completed CJ Products Sync.');
+    } catch (error) {
+      console.error('[Worker] Failed CJ Products Sync:', error);
+    } finally {
+      isSyncing = false;
+    }
+  };
 
   // Schedule cron job to run daily at 2:00 AM
-  await boss.schedule(JOB_SYNC_CJ_PRODUCTS, '0 2 * * *');
-  
-  // Also queue it immediately once for initial setup (if not already queued)
-  await boss.send(JOB_SYNC_CJ_PRODUCTS, {}, { singletonKey: 'initial-sync' });
+  cron.schedule('0 2 * * *', runSync);
+
+  // Run the initial sync immediately in the background
+  setTimeout(runSync, 5000); // Wait 5 seconds after boot to start
 };
