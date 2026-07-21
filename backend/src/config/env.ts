@@ -8,4 +8,5 @@ if (!process.env.SECRET_KEY) {
 
 export const config = {
   jwtSecret: process.env.SECRET_KEY,
+  databaseUrl: process.env.DATABASE_URL || "",
 };

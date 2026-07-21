@@ -136,6 +136,6 @@ app.listen(PORT, async () => {
     await initQueue();
     await startWorkers();
   } catch (err) {
-    logger.error("Failed to start background queue/workers:", err);
+    logger.error({ err }, "Failed to start background queue/workers:");
   }
 });

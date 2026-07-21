@@ -1,4 +1,4 @@
-import PgBoss from 'pg-boss';
+import { PgBoss } from 'pg-boss';
 import { config } from '../config/env.js';
 
 let boss: PgBoss | null = null;
@@ -8,7 +8,7 @@ export const initQueue = async () => {
 
   boss = new PgBoss(config.databaseUrl);
 
-  boss.on('error', (error) => console.error('pg-boss error:', error));
+  boss.on('error', (error: Error) => console.error('pg-boss error:', error));
 
   try {
     await boss.start();

@@ -17,7 +17,7 @@ export class CjSyncService {
     for (const category of categories) {
       if (!category.cj_keyword) continue;
       
-      const subcategoryId = category.subcategories.length > 0 ? category.subcategories[0].id : null;
+      const subcategoryId = category.subcategories?.[0]?.id || null;
       if (!subcategoryId) {
         console.warn(`[SyncService] Skipping category ${category.name} because it has no subcategories.`);
         continue;
