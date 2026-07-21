@@ -89,6 +89,14 @@ app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/auth/forgot-password", authLimiter);
 
+// API responses are dynamic and must never be edge/browser-cached — without this,
+// Hostinger's default edge (hcdn) caches GET responses for hours, serving stale
+// data (e.g. a stale product list) to real customers after every write.
+app.use("/api", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
+
 // Routes
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
