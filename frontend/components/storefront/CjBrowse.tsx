@@ -23,7 +23,7 @@ export function CjBrowse({ keyword, initialPage = 1, hideIfEmpty = false }: CjBr
 
   const fetchOnce = async (kw: string, p: number) => {
     const res = await fetch(
-      `/server-proxy/cj/browse/hunt?keyword=${encodeURIComponent(kw)}&page=${p}&size=20&minImages=2`,
+      `/server-proxy/cj/browse?keyword=${encodeURIComponent(kw)}&page=${p}&size=20`,
       { cache: 'no-store' },
     );
     const json = await res.json();
