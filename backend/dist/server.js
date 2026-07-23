@@ -115,19 +115,44 @@ app.use("/api/media-file", mediaFileRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/analytics-event", analyticsEventRoutes);
 app.use("/api/cj", cjRoutes);
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+const prisma = new PrismaClient();
 // TEMPORARY ENDPOINT TO SEED LIVE DATABASE
 app.get("/api/admin/seed-now", async (req, res) => {
     try {
-        const { exec } = await import("child_process");
-        exec("npx tsx prisma/seed.ts", (error, stdout, stderr) => {
-            if (error) {
-                return res.status(500).json({ error: error.message, stderr, stdout });
-            }
-            res.status(200).json({ message: "Seed completed successfully!", stdout });
+        const rolesData = [
+            { role_name: 'SuperAdmin', description: 'System Administrator' },
+            { role_name: 'Admin', description: 'Store Administrator' },
+            { role_name: 'Customer', description: 'Regular Customer' },
+        ];
+        const createdRoles = {};
+        for (const r of rolesData) {
+            const role = await prisma.role.upsert({
+                where: { role_name: r.role_name },
+                update: {},
+                create: r,
+            });
+            createdRoles[role.role_name] = role.id;
+        }
+        const adminRoleId = createdRoles['SuperAdmin'] || 1;
+        const adminPassword = await bcrypt.hash('admin123', 10);
+        const admin = await prisma.user.upsert({
+            where: { email: 'admin@atozgadgets.com' },
+            update: {},
+            create: {
+                first_name: 'Admin',
+                last_name: 'User',
+                email: 'admin@atozgadgets.com',
+                mobile: '1234567890',
+                password_hash: adminPassword,
+                role_id: adminRoleId,
+            },
         });
+        res.status(200).json({ message: "Seed completed successfully!", admin });
     }
     catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message, stack: err.stack });
     }
 });
 // Centralized error handling
