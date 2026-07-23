@@ -127,6 +127,21 @@ app.use("/api/notification", notificationRoutes);
 app.use("/api/analytics-event", analyticsEventRoutes);
 app.use("/api/cj", cjRoutes);
 
+// TEMPORARY ENDPOINT TO SEED LIVE DATABASE
+app.get("/api/admin/seed-now", async (req, res) => {
+  try {
+    const { exec } = await import("child_process");
+    exec("npx tsx prisma/seed.ts", (error, stdout, stderr) => {
+      if (error) {
+        return res.status(500).json({ error: error.message, stderr, stdout });
+      }
+      res.status(200).json({ message: "Seed completed successfully!", stdout });
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Centralized error handling
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error({ err }, "Unhandled error");

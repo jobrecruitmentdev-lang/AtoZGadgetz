@@ -5,7 +5,6 @@ import helmet from "helmet";
 import pinoHttp from "pino-http";
 import rateLimit from "express-rate-limit";
 import { logger } from "./utils/logger.js";
-import { execSync } from "child_process";
 import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import productRoutes from "./routes/product.routes.js";
@@ -116,6 +115,21 @@ app.use("/api/media-file", mediaFileRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/analytics-event", analyticsEventRoutes);
 app.use("/api/cj", cjRoutes);
+// TEMPORARY ENDPOINT TO SEED LIVE DATABASE
+app.get("/api/admin/seed-now", async (req, res) => {
+    try {
+        const { exec } = await import("child_process");
+        exec("npx tsx prisma/seed.ts", (error, stdout, stderr) => {
+            if (error) {
+                return res.status(500).json({ error: error.message, stderr, stdout });
+            }
+            res.status(200).json({ message: "Seed completed successfully!", stdout });
+        });
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 // Centralized error handling
 app.use((err, req, res, next) => {
     logger.error({ err }, "Unhandled error");
@@ -126,16 +140,6 @@ app.use((err, req, res, next) => {
 });
 app.listen(PORT, async () => {
     logger.info(`Server is running on port ${PORT}`);
-    if (process.env.NODE_ENV === "production") {
-        try {
-            logger.info("Production mode detected. Automatically pushing database schema...");
-            execSync("npx prisma db push --accept-data-loss", { stdio: "inherit" });
-            logger.info("Database schema synchronized successfully!");
-        }
-        catch (dbErr) {
-            logger.error({ err: dbErr }, "Failed to push database schema during startup.");
-        }
-    }
     try {
         await startWorkers();
     }
