@@ -145,3 +145,6 @@ app.listen(PORT, async () => {
     logger.error({ err }, "Failed to start background queue/workers:");
   }
 });
+
+export { app };
+export default app;

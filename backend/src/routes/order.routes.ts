@@ -3,6 +3,7 @@ import {
   getAllOrders,
   getMyOrders,
   getOrderById,
+  getOrderInvoice,
   placeOrder,
   updateOrderStatus,
 } from "../controllers/order.controller.js";
@@ -19,6 +20,7 @@ const router = Router();
 router.get("/", authenticateJWT, requireAdminOrSuperAdmin, getAllOrders);
 router.get("/mine", authenticateJWT, getMyOrders);
 router.get("/:id", authenticateJWT, getOrderById);
+router.get("/:id/invoice", authenticateJWT, getOrderInvoice);
 router.post("/place", optionalAuthenticateJWT, placeOrder);
 router.patch(
   "/:id/status",

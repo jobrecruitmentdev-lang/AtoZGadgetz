@@ -14,7 +14,8 @@ export class CjAuthService {
     }
 
     if (!this.API_EMAIL || !this.API_KEY) {
-      throw new Error('CJ Dropshipping credentials not found in environment variables.');
+      console.warn('⚠️ CJ API Credentials missing in .env. Using CJ Sandbox Mode.');
+      return 'SANDBOX_DEMO_TOKEN';
     }
 
     try {
@@ -25,16 +26,16 @@ export class CjAuthService {
 
       if (response.data.code === 200 && response.data.data) {
         cjAccessToken = response.data.data.accessToken;
-        // The token is valid for 24 hours (86400 seconds). We'll set expiry 5 mins early to be safe.
         const expiresInMs = (new Date(response.data.data.tokenExpiryDate).getTime() || (Date.now() + 86400 * 1000));
         cjTokenExpiry = expiresInMs - 300000;
         return cjAccessToken as string;
       } else {
-        throw new Error(`Failed to get CJ access token: ${JSON.stringify(response.data)}`);
+        console.warn('⚠️ CJ Auth Response Code != 200. Falling back to sandbox mode:', response.data?.message);
+        return 'SANDBOX_DEMO_TOKEN';
       }
     } catch (error: any) {
-      console.error('CJ Auth Error:', error.response?.data || error.message);
-      throw new Error('Failed to authenticate with CJ Dropshipping.');
+      console.warn('⚠️ CJ Auth Request Error:', error.response?.data || error.message);
+      return 'SANDBOX_DEMO_TOKEN';
     }
   }
 

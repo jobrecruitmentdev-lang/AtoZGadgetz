@@ -105,6 +105,36 @@ model PasswordResetToken {
   @@map("password_reset_tokens")
 }
 
+model MobileOtp {
+  id         Int      @id @default(autoincrement())
+  mobile     String   @db.VarChar(20)
+  otp_hash   String   @db.VarChar(255)
+  purpose    String   @default("login") @db.VarChar(30)
+  expires_at DateTime
+  used_at    DateTime?
+  attempts   Int      @default(0)
+  created_at DateTime @default(now())
+  ip_address String?  @db.VarChar(45)
+  user_agent String?  @db.VarChar(500)
+
+  @@index([mobile, purpose, created_at])
+  @@map("mobile_otps")
+}
+
+model EmailActivationToken {
+  id         Int      @id @default(autoincrement())
+  email      String   @db.VarChar(150)
+  token_hash String   @unique @db.VarChar(255)
+  expires_at DateTime
+  used_at    DateTime?
+  created_at DateTime @default(now())
+  ip_address String?  @db.VarChar(45)
+  user_agent String?  @db.VarChar(500)
+
+  @@index([email, created_at])
+  @@map("email_activation_tokens")
+}
+
 model UserAddress {
   id            Int      @id @default(autoincrement())
   user_id       Int

@@ -40,9 +40,9 @@ test.describe('Order API', () => {
     expect(response.status()).toBe(401);
   });
 
-  test('POST /order/place without token returns 400', async ({ request }) => {
+  test('POST /order/place without token returns 401', async ({ request }) => {
     const response = await request.post(`${API_URL}/order/place`, { data: {} });
-    expect(response.status()).toBe(400);
+    expect(response.status()).toBe(401);
   });
 
   test('GET /order/:id for another user\'s (non-existent) order does not leak via 500', async ({ request }) => {

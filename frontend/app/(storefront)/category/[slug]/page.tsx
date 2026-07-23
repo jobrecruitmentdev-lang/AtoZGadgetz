@@ -10,7 +10,7 @@ import { ChevronRight } from 'lucide-react';
 
 async function findCategoryBySlug(slug: string) {
   try {
-    const cData = await fetchApi<{ data?: any[] } | any[]>('/categories');
+    const cData = await fetchApi<{ data?: any[] } | any[]>('/categories?hasProducts=true');
     const categories = Array.isArray(cData) ? cData : cData?.data || [];
     for (const c of categories) {
       if (c.slug === slug) return c;
@@ -71,7 +71,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       category: p.category?.name || 'Uncategorized',
     }));
 
-    const cData = await fetchApi<{ data?: any[] } | any[]>('/categories');
+    const cData = await fetchApi<{ data?: any[] } | any[]>('/categories?hasProducts=true');
     categories = Array.isArray(cData) ? cData : cData?.data || [];
   } catch (err) {
     console.error('CategoryPage: failed to load', err);

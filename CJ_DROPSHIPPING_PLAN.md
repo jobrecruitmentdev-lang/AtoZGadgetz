@@ -5,6 +5,23 @@
 
 ---
 
+## Implementation Status
+
+| Area | Status | Notes |
+|---|---|---|
+| Prisma schema (`CjProduct`, `CjOrder`, `CjShipment`) | ✅ Implemented | Additive tables + `Product.fulfillment_type` exist in `prisma/schema.prisma` |
+| CJ auth token service | ✅ Implemented | `src/services/cj/cj-auth.service.ts` caches live token 24h, falls back to sandbox if credentials missing |
+| CJ HTTP rate-limit gate | ✅ Implemented | `src/services/cj/cj-http.ts` serializes calls to ~1 req/sec |
+| Product search + import | ✅ Implemented | `src/services/cj/cj-product.service.ts` hits `/product/listV2` and `/product/query` |
+| Quality filter (min images) | ✅ Implemented | `huntProducts` verifies image count via `getProductDetail`; 1-hour detail cache |
+| API health visibility | ✅ Implemented | `GET /api/cj/health` returns live/sandbox status + sample product count |
+| Frontend admin import UI | ✅ Implemented | `app/(admin)/admin/catalog/import/CjImportClient.tsx`: single fetch button, quality filter, pagination |
+| Order placement | ✅ Skeleton | `src/services/cj/cj-order.service.ts` exists but requires payment-gateway wiring |
+| Shipment sync + webhook | ✅ Skeleton | `src/services/cj/cj-shipment.service.ts` exists; webhook endpoint mounted |
+| Payment gateways | 🚧 Not integrated | Razorpay/Stripe services are placeholders; see Section 4 |
+
+---
+
 ## Overview
 
 This document describes how to wire CJDropshipping into the existing AtoZGadgets stack
@@ -191,7 +208,7 @@ src/
 
 **Search products:**
 ```
-GET /v1/product/list?categoryKeyword=gadget&pageNum=1&pageSize=20
+GET /v1/product/listV2?keyWord=gadget&pageNum=1&pageSize=20
 ```
 
 **Get product detail (variants, images, price):**
@@ -199,12 +216,18 @@ GET /v1/product/list?categoryKeyword=gadget&pageNum=1&pageSize=20
 GET /v1/product/query?pid=CJ_PRODUCT_ID
 ```
 
+**Quality filter ("hunt"):**
+- Admin sets `minImages` on the frontend (default = 1, i.e. no filter).
+- When `minImages > 1`, the service calls `getProductDetail` for each candidate on the requested page, counts images from `productImageSet` / `productImage` / `productImages`, and returns only products that meet the threshold.
+- Detail results are cached in memory for 1 hour so repeated hunts/pagination are faster.
+- A 20-second soft deadline prevents requests from hanging; partial results are returned if the deadline is hit.
+
 **Import to local DB:**
 ```ts
 async importProduct(cjPid: string) {
   const cjProduct = await this.getProductDetail(cjPid)
   // Map CJ fields → Prisma Product + ProductVariant + ProductImage
-  // Set is_dropship = true, cj_product_id = cjPid
+  // Set fulfillment_type = 'cj', link CjProduct record
   // Set supplier_price from CJ, selling_price = supplier_price * markup
 }
 ```
@@ -302,14 +325,22 @@ Enable auto-debit on CJ so orders submit automatically once wallet has balance.
 ## 5. Frontend Changes
 
 ### 5a. Admin — CJ Product Import Page
-**New route:** `app/(admin)/admin/catalog/import/page.tsx`
+**Route:** `app/(admin)/admin/catalog/import/page.tsx`
 
 ```
-Search bar → hits GET /api/cj/products?keyword=xxx
-Results grid → each card has "Import" button
-Import → POST /api/cj/products/import { cjPid }
-Success → product appears in /admin/catalog/products
+Tab 1: Staged Products in DB (local MySQL products with fulfillment_type = 'cj')
+Tab 2: Fetch New Products from CJ
+  ├── CJ API health indicator (live/sandbox + total available)
+  ├── Target category, subcategory, markup
+  ├── Budget filters (min/max supplier cost)
+  ├── Batch limit selector (12/24/48/60)
+  ├── Quality filter (min images, default 1)
+  ├── Fetch button + Previous/Next pagination
+  └── Results grid → select + batch/single import
 ```
+
+- All fetch/pagination calls use the same endpoint: `GET /api/cj/browse?keyword=&page=&size=&minImages=&minPrice=&maxPrice=`.
+- When `minImages > 1`, the backend routes to the quality-filter path automatically.
 
 ### 5b. Checkout — Razorpay Integration
 **Modify:** `app/(storefront)/checkout/page.tsx`
@@ -396,11 +427,12 @@ Docs: https://developers.cjdropshipping.cn/en/api/introduction.html
 
 ---
 
-### Authentication
+### Authentication & Health
 
 | Purpose | Method | Endpoint |
 |---|---|---|
 | Get access token | POST | `/authentication/getAccessToken` |
+| Verify API connectivity | GET | `/api/cj/health` |
 
 **Body:** `{ email, accessKey }` → returns `{ accessToken, expiresIn }`
 Cache the token in memory and refresh before expiry. All subsequent requests need `CJ-Access-Token` header.

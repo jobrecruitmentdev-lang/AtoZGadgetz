@@ -12,7 +12,19 @@ export class UserRepository {
     return prisma.user.findUnique({ where: { email } });
   }
 
+  async findByMobile(mobile: string) {
+    return prisma.user.findUnique({ where: { mobile } });
+  }
+
   async create(data: Prisma.UserUncheckedCreateInput) {
     return prisma.user.create({ data });
+  }
+
+  async findById(id: number) {
+    return prisma.user.findUnique({ where: { id } });
+  }
+
+  async updateById(id: number, data: Prisma.UserUncheckedUpdateInput) {
+    return prisma.user.update({ where: { id }, data });
   }
 }

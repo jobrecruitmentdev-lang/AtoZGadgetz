@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   authenticateJWT,
+  optionalAuthenticateJWT,
   requireAdminOrSuperAdmin,
 } from '../middlewares/auth.middleware.js';
 import {
@@ -18,6 +19,7 @@ import {
   syncCjCategories,
   syncCjInventory,
   syncAllCjInventory,
+  getCjHealth,
 } from '../controllers/cj.controller.js';
 
 const router = Router();
@@ -26,20 +28,24 @@ const router = Router();
 router.post('/webhook', handleCjWebhook);
 
 // Public storefront browse — no auth required
+router.get('/health', getCjHealth);
 router.get('/browse', searchCjProducts);
 router.get('/browse/hunt', huntCjProducts);
 router.get('/products/public/:pid', getCjProductDetail);
+
+// Product catalog search & hunt
+router.get('/products/search', authenticateJWT, requireAdminOrSuperAdmin, searchCjProducts);
+router.get('/products/hunt', authenticateJWT, requireAdminOrSuperAdmin, huntCjProducts);
+router.get('/products/:pid', authenticateJWT, requireAdminOrSuperAdmin, getCjProductDetail);
+
+// Product import into local DB
+router.post('/products/import', authenticateJWT, requireAdminOrSuperAdmin, importCjProduct);
+
 // Auto-import a CJ product on customer add-to-cart — only needs to be logged in
 router.post('/products/auto-import', authenticateJWT, autoImportCjProduct);
 
-// All remaining routes require admin
+// All remaining admin routes require admin authentication
 router.use(authenticateJWT, requireAdminOrSuperAdmin);
-
-// Product catalog
-router.get('/products/search', searchCjProducts);
-router.get('/products/hunt', huntCjProducts);
-router.get('/products/:pid', getCjProductDetail);
-router.post('/products/import', importCjProduct);
 
 // Order management
 router.post('/orders/:orderId/place', placeCjOrder);

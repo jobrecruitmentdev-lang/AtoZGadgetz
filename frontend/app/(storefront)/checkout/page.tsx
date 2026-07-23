@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { RevealOnScroll } from '@/components/motion/RevealOnScroll';
@@ -7,12 +7,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
 
 import { useCart } from '@/components/storefront/CartContext';
+import { useAuth } from '@/components/auth/AuthContext';
 import { fetchApi } from '@/lib/api-client';
 import { TrustBadges } from '@/components/storefront/TrustBadges';
 
 declare global {
   interface Window {
     Razorpay: any;
+    paypal: any;
   }
 }
 
@@ -22,9 +24,13 @@ const inputCls =
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, refreshCart } = useCart();
+  const { user, loading: authLoading, refreshUser } = useAuth();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'razorpay'>('paypal');
+  const paypalCaptureRef = useRef(false);
 
   const [form, setForm] = useState({
     firstName: '',
@@ -39,19 +45,41 @@ export default function CheckoutPage() {
     country: 'US',
   });
 
+  const [profileForm, setProfileForm] = useState({
+    firstName: '',
+    lastName: '',
+    mobile: '',
+  });
+
   const items = cart?.items || [];
-  // product is Record<string,unknown> — cast to any for safe property access
   const subtotal = items.reduce(
     (sum, item) => sum + parseFloat(String((item.product as any)?.price ?? 0)) * item.quantity,
     0,
   );
   const shippingFee = subtotal >= 30 ? 0 : 5.99;
   const total = subtotal + shippingFee;
+  const profileIncomplete = !!user && (!user.first_name?.trim() || !user.last_name?.trim() || !user.mobile?.trim());
+
+  useEffect(() => {
+    if (!user) return;
+    setProfileForm({
+      firstName: user.first_name || '',
+      lastName: user.last_name || '',
+      mobile: user.mobile || '',
+    });
+    setForm((prev) => ({
+      ...prev,
+      firstName: user.first_name || prev.firstName,
+      lastName: user.last_name || prev.lastName,
+      email: user.email || prev.email,
+      phone: user.mobile || prev.phone,
+    }));
+  }, [user]);
 
   useEffect(() => {
     // Load Razorpay script
-    const existing = document.getElementById('razorpay-script');
-    if (!existing) {
+    const existingRp = document.getElementById('razorpay-script');
+    if (!existingRp) {
       const script = document.createElement('script');
       script.id = 'razorpay-script';
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -60,14 +88,90 @@ export default function CheckoutPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (paypalCaptureRef.current) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const isPaypalReturn = params.get('paypal') === '1';
+    const orderId = params.get('orderId');
+    const token = params.get('token');
+
+    if (!isPaypalReturn || !orderId || !token) return;
+
+    paypalCaptureRef.current = true;
+    setStep(2);
+    setLoading(true);
+    setError(null);
+
+    const captureAfterReturn = async () => {
+      await fetchApi('/api/payment/paypal/capture-order', {
+        method: 'POST',
+        body: JSON.stringify({
+          paypalOrderId: token,
+          orderId: Number(orderId),
+        }),
+      });
+      await refreshCart();
+      router.replace('/order-success');
+    };
+
+    captureAfterReturn().catch((err: any) => {
+      setError(err.message || 'PayPal capture failed. Please retry checkout.');
+      setLoading(false);
+      paypalCaptureRef.current = false;
+    });
+  }, [refreshCart, router]);
+
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setStep(2);
   };
 
+  const handleCompleteProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileLoading(true);
+    setError(null);
+    try {
+      await fetchApi('/api/auth/profile/complete', {
+        method: 'POST',
+        body: JSON.stringify({
+          first_name: profileForm.firstName,
+          last_name: profileForm.lastName,
+          mobile: profileForm.mobile,
+        }),
+      });
+      await refreshUser();
+      setForm((prev) => ({
+        ...prev,
+        firstName: profileForm.firstName,
+        lastName: profileForm.lastName,
+        phone: profileForm.mobile,
+      }));
+    } catch (e: any) {
+      setError(e.message || 'Failed to complete profile.');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const handlePayPalPayment = async (orderId: number) => {
+    const ppOrder = await fetchApi<{
+      paypal_order_id: string;
+      status: string;
+      approve_url: string;
+    }>('/api/payment/paypal/create-order', {
+      method: 'POST',
+      body: JSON.stringify({ orderId }),
+    });
+
+    if (!ppOrder.approve_url) {
+      throw new Error('Unable to start PayPal approval flow.');
+    }
+    window.location.href = ppOrder.approve_url;
+  };
+
   const handleRazorpayPayment = async (orderId: number) => {
-    // 1. Create Razorpay order on backend
     const rpOrder = await fetchApi<{
       razorpay_order_id: string;
       amount: number;
@@ -94,7 +198,6 @@ export default function CheckoutPage() {
         theme: { color: '#c9a962' },
         handler: async (response: any) => {
           try {
-            // 2. Verify signature on backend — this also places the CJ order
             await fetchApi('/api/payment/razorpay/verify', {
               method: 'POST',
               body: JSON.stringify({
@@ -143,12 +246,6 @@ export default function CheckoutPage() {
             postal_code: form.postalCode,
             country: form.country,
           },
-          guest: {
-            firstName: form.firstName,
-            lastName: form.lastName,
-            email: form.email,
-            phone: form.phone,
-          },
           items: items.map((i) => ({
             product_id: (i.product as any)?.id || i.product_id,
             quantity: i.quantity,
@@ -158,14 +255,19 @@ export default function CheckoutPage() {
         }),
       });
 
-      // 2. Open Razorpay
-      await handleRazorpayPayment(order.id);
+      // 2. Execute selected payment gateway
+      if (paymentMethod === 'paypal') {
+        await handlePayPalPayment(order.id);
+        return;
+      } else {
+        await handleRazorpayPayment(order.id);
+      }
 
-      // 3. Payment verified — clear cart and redirect
+      // 3. Payment verified — clear cart and redirect to order success
       await refreshCart();
       router.push('/order-success');
     } catch (e: any) {
-      setError(e.message || 'Something went wrong. Please try again.');
+      setError(e.message || 'Something went wrong with your payment. Please try again.');
       setLoading(false);
     }
   };
@@ -175,6 +277,61 @@ export default function CheckoutPage() {
       <RevealOnScroll>
         <h1 className="text-3xl font-bold tracking-tighter mb-10">Checkout</h1>
       </RevealOnScroll>
+
+      {!authLoading && !user && (
+        <div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6">
+          <h2 className="text-xl font-bold mb-2">Sign in required for checkout</h2>
+          <p className="text-sm text-muted mb-4">
+            Please sign in first. After login, complete your profile once, then continue checkout.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push('/login?from=/checkout')}
+            className="bg-accent text-white px-6 py-2.5 rounded-xl font-semibold text-sm"
+          >
+            Sign in to Continue
+          </button>
+        </div>
+      )}
+
+      {!authLoading && user && profileIncomplete && (
+        <form onSubmit={handleCompleteProfile} className="mb-8 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-6 space-y-4">
+          <h2 className="text-xl font-bold">Complete your profile before purchase</h2>
+          <p className="text-sm text-muted">
+            Your account must have verified personal details and international mobile number (E.164 format, e.g. +14155550123).
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input
+              required
+              value={profileForm.firstName}
+              onChange={(e) => setProfileForm((prev) => ({ ...prev, firstName: e.target.value }))}
+              className={inputCls}
+              placeholder="First name"
+            />
+            <input
+              required
+              value={profileForm.lastName}
+              onChange={(e) => setProfileForm((prev) => ({ ...prev, lastName: e.target.value }))}
+              className={inputCls}
+              placeholder="Last name"
+            />
+            <input
+              required
+              value={profileForm.mobile}
+              onChange={(e) => setProfileForm((prev) => ({ ...prev, mobile: e.target.value }))}
+              className={inputCls}
+              placeholder="+14155550123"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={profileLoading}
+            className="bg-accent text-white px-6 py-2.5 rounded-xl font-semibold text-sm disabled:opacity-60"
+          >
+            {profileLoading ? 'Saving Profile...' : 'Save Profile and Continue'}
+          </button>
+        </form>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
         {/* Left — Forms */}
@@ -190,6 +347,7 @@ export default function CheckoutPage() {
             </span>
           </div>
 
+          {user && !profileIncomplete && (
           <AnimatePresence mode="wait">
             {/* ── Step 1: Shipping ── */}
             {step === 1 && (
@@ -287,31 +445,106 @@ export default function CheckoutPage() {
                 className="space-y-6"
               >
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold">Secure Payment</h2>
+                  <h2 className="text-xl font-bold">Select Payment Method</h2>
                   <button onClick={() => setStep(1)} className="text-sm text-accent hover:underline">
                     ← Edit Shipping
                   </button>
                 </div>
 
-                {/* Razorpay info */}
-                <div className="bg-accent/5 border border-accent/20 rounded-2xl p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <ShieldCheck size={20} className="text-green-500" />
-                    <p className="font-semibold">Razorpay Secure Checkout</p>
+                {/* Priority Payment Gateway Selector */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  {/* Gateway #1: PayPal (Priority #1) */}
+                  <div
+                    onClick={() => setPaymentMethod('paypal')}
+                    className={`cursor-pointer rounded-2xl p-5 border-2 transition-all relative ${
+                      paymentMethod === 'paypal'
+                        ? 'border-blue-500 bg-blue-500/5 shadow-md'
+                        : 'border-foreground/10 hover:border-foreground/30 bg-surface'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-blue-600 text-lg tracking-tight">PayPal</span>
+                        <span className="text-[10px] uppercase font-bold bg-blue-500 text-white px-2 py-0.5 rounded-full">
+                          Priority #1
+                        </span>
+                      </div>
+                      <input
+                        type="radio"
+                        name="paymentGateway"
+                        checked={paymentMethod === 'paypal'}
+                        onChange={() => setPaymentMethod('paypal')}
+                        className="w-4 h-4 text-blue-600 cursor-pointer"
+                      />
+                    </div>
+                    <p className="text-xs text-muted">
+                      Fast, secure global checkout with PayPal balance, Credit Card, or Pay Later.
+                    </p>
                   </div>
-                  <p className="text-sm text-muted leading-relaxed">
-                    After clicking Pay, you'll be securely redirected to Razorpay. We accept
-                    Visa, Mastercard, Amex, Maestro, UPI, Net Banking, and Debit Cards.
-                    Your card details are never stored on our servers.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {['Visa', 'Mastercard', 'Amex', 'UPI', 'Net Banking', 'Maestro'].map((m) => (
-                      <span key={m} className="text-xs px-2.5 py-1 bg-background rounded border border-foreground/10 font-medium">
-                        {m}
-                      </span>
-                    ))}
+
+                  {/* Gateway #2: Razorpay (Cards & Local) */}
+                  <div
+                    onClick={() => setPaymentMethod('razorpay')}
+                    className={`cursor-pointer rounded-2xl p-5 border-2 transition-all relative ${
+                      paymentMethod === 'razorpay'
+                        ? 'border-accent bg-accent/5 shadow-md'
+                        : 'border-foreground/10 hover:border-foreground/30 bg-surface'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-foreground text-sm">Credit / Debit Card / UPI</span>
+                      </div>
+                      <input
+                        type="radio"
+                        name="paymentGateway"
+                        checked={paymentMethod === 'razorpay'}
+                        onChange={() => setPaymentMethod('razorpay')}
+                        className="w-4 h-4 text-accent cursor-pointer"
+                      />
+                    </div>
+                    <p className="text-xs text-muted">
+                      Powered by Razorpay. Supports Visa, Mastercard, Amex, UPI & Net Banking.
+                    </p>
                   </div>
                 </div>
+
+                {/* Gateway Info Banner */}
+                {paymentMethod === 'paypal' ? (
+                  <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-2">
+                      <ShieldCheck size={20} className="text-blue-500" />
+                      <p className="font-semibold text-blue-600 dark:text-blue-400">PayPal Express Gateway</p>
+                    </div>
+                    <p className="text-xs text-muted leading-relaxed">
+                      You will complete your order securely with PayPal REST API v2. Includes full buyer protection & instant order confirmation.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {['PayPal Express', 'PayPal Credit', 'Pay in 4', 'Debit / Credit Card'].map((m) => (
+                        <span key={m} className="text-xs px-2.5 py-1 bg-background rounded border border-foreground/10 font-medium">
+                          {m}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-accent/5 border border-accent/20 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-2">
+                      <ShieldCheck size={20} className="text-green-500" />
+                      <p className="font-semibold">Razorpay Secure Checkout</p>
+                    </div>
+                    <p className="text-xs text-muted leading-relaxed">
+                      We accept Visa, Mastercard, Amex, Maestro, UPI, Net Banking, and Debit Cards.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {['Visa', 'Mastercard', 'Amex', 'UPI', 'Net Banking', 'Maestro'].map((m) => (
+                        <span key={m} className="text-xs px-2.5 py-1 bg-background rounded border border-foreground/10 font-medium">
+                          {m}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {error && (
                   <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/30 text-red-500 rounded-xl px-4 py-3 text-sm">
@@ -323,10 +556,18 @@ export default function CheckoutPage() {
                 <button
                   onClick={handlePlaceOrder}
                   disabled={loading || items.length === 0}
-                  className="w-full flex items-center justify-center gap-3 bg-accent text-white py-4 rounded-xl font-bold text-lg hover:bg-accent/90 transition-all duration-300 shadow-lg shadow-accent/25 disabled:opacity-60"
+                  className={`w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-lg text-white transition-all duration-300 shadow-lg disabled:opacity-60 ${
+                    paymentMethod === 'paypal'
+                      ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/25'
+                      : 'bg-accent hover:bg-accent/90 shadow-accent/25'
+                  }`}
                 >
                   {loading ? <Loader2 size={22} className="animate-spin" /> : <ShieldCheck size={22} />}
-                  {loading ? 'Processing…' : `Pay $${total.toFixed(2)} — Razorpay`}
+                  {loading
+                    ? 'Processing Order…'
+                    : paymentMethod === 'paypal'
+                    ? `Pay $${total.toFixed(2)} with PayPal`
+                    : `Pay $${total.toFixed(2)} — Razorpay`}
                 </button>
 
                 <p className="text-xs text-center text-muted">
@@ -337,6 +578,7 @@ export default function CheckoutPage() {
               </motion.div>
             )}
           </AnimatePresence>
+          )}
         </div>
 
         {/* Right — Order Summary */}

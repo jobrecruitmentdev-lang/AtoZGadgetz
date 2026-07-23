@@ -7,6 +7,9 @@ import { fetchApi } from '@/lib/api-client';
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     fetchApi<any[]>('/api/order').then(res => {
@@ -18,11 +21,29 @@ export default function AdminOrdersPage() {
     });
   }, []);
 
+  const filteredOrders = orders.filter((order) => {
+    const query = searchQuery.trim().toLowerCase();
+    const matchesQuery =
+      query.length === 0 ||
+      String(order.order_number || '').toLowerCase().includes(query) ||
+      String(order.user_id || '').toLowerCase().includes(query);
+
+    const matchesStatus =
+      statusFilter === 'all' ||
+      String(order.order_status || '').toLowerCase() === statusFilter;
+
+    return matchesQuery && matchesStatus;
+  });
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Orders</h1>
-        <button className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800 px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
+        <button
+          type="button"
+          onClick={() => setShowFilters((prev) => !prev)}
+          className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800 px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+        >
           <Filter size={16} /> Advanced Filters
         </button>
       </div>
@@ -33,16 +54,26 @@ export default function AdminOrdersPage() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search orders..." 
+              placeholder="Search orders..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-gray-100 dark:bg-gray-900 border-none rounded-md py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
             />
           </div>
-          <select className="bg-gray-100 dark:bg-gray-900 border-none rounded-md py-2 px-4 text-sm focus:outline-none">
-            <option>All Statuses</option>
-            <option>Processing</option>
-            <option>Shipped</option>
-            <option>Delivered</option>
-          </select>
+          {showFilters && (
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-gray-100 dark:bg-gray-900 border-none rounded-md py-2 px-4 text-sm focus:outline-none"
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          )}
         </div>
 
         <div className="overflow-x-auto">
@@ -60,7 +91,7 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-                {orders.map((order) => (
+                {filteredOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
                     <td className="px-6 py-4 font-medium text-black dark:text-white">{order.order_number}</td>
                     <td className="px-6 py-4 text-gray-500">{new Date(order.created_at).toLocaleDateString()}</td>
@@ -84,9 +115,9 @@ export default function AdminOrdersPage() {
                     </td>
                   </tr>
                 ))}
-                {orders.length === 0 && (
+                {filteredOrders.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">No orders found.</td>
+                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">No orders found for the current filters.</td>
                   </tr>
                 )}
               </tbody>

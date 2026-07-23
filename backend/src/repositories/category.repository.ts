@@ -2,8 +2,24 @@ import { prisma } from "../prisma.js";
 import { Prisma } from "@prisma/client";
 
 export class CategoryRepository {
-  async findAll() {
-    return prisma.category.findMany({ include: { subcategories: true } });
+  async findAll(onlyWithProducts?: boolean) {
+    const whereClause = onlyWithProducts
+      ? {
+          products: {
+            some: { is_active: true },
+          },
+        }
+      : {};
+
+    return prisma.category.findMany({
+      where: whereClause,
+      include: {
+        subcategories: true,
+        _count: {
+          select: { products: true },
+        },
+      },
+    });
   }
 
   async create(data: Prisma.CategoryUncheckedCreateInput) {

@@ -60,14 +60,6 @@ export function ProductActions({ productId, productDescription, productName }: P
         </button>
       </div>
 
-      {/* Dropshipper / Reseller Action */}
-      <button 
-        onClick={handleCopy}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-accent/40 bg-accent/5 text-accent hover:bg-accent/10 transition-colors text-sm font-medium"
-      >
-        {copied ? <Check size={16} /> : <Copy size={16} />}
-        {copied ? 'Description Copied!' : 'Copy Details for Reselling'}
-      </button>
     </div>
   );
 }

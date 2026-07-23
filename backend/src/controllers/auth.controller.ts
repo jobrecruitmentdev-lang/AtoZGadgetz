@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service.js";
-import { registerSchema, loginSchema } from "../validators/auth.schema.js";
+import {
+  registerSchema,
+  loginSchema,
+  magicLinkRequestSchema,
+  magicLinkVerifySchema,
+  completeRegistrationSchema,
+  completeProfileSchema,
+} from "../validators/auth.schema.js";
 
 const authService = new AuthService();
 
@@ -93,5 +100,99 @@ export const resetPassword = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const sendMobileOtp = async (req: Request, res: Response) => {
+  try {
+    const { mobile, purpose = "login" } = req.body;
+    if (!mobile) throw new Error("Mobile is required");
+
+    await authService.sendMobileOtp(
+      String(mobile),
+      String(purpose),
+      req.ip || "",
+      String(req.headers["user-agent"] || ""),
+    );
+
+    res.json({
+      success: true,
+      message: "If the mobile number is valid, OTP has been sent.",
+    });
+  } catch (error: any) {
+    const status = /too many otp requests/i.test(error.message) ? 429 : 400;
+    res.status(status).json({ success: false, message: error.message });
+  }
+};
+
+export const verifyMobileOtp = async (req: Request, res: Response) => {
+  try {
+    const { mobile, otp, purpose = "login" } = req.body;
+    const result = await authService.verifyMobileOtp(String(mobile), String(otp), String(purpose));
+    res.json({
+      success: true,
+      message: "OTP verified successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const requestMagicLink = async (req: Request, res: Response) => {
+  try {
+    const { email } = magicLinkRequestSchema.parse(req.body);
+    await authService.requestActivationMagicLink(
+      email,
+      req.ip || "",
+      String(req.headers["user-agent"] || ""),
+    );
+    res.json({
+      success: true,
+      message: "If the email is available, an activation link has been sent.",
+    });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.errors || error.message });
+  }
+};
+
+export const verifyMagicLink = async (req: Request, res: Response) => {
+  try {
+    const { token } = magicLinkVerifySchema.parse(req.body);
+    const data = await authService.verifyActivationMagicLink(token);
+    res.json({ success: true, message: "Activation verified.", data });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.errors || error.message });
+  }
+};
+
+export const completeRegistration = async (req: Request, res: Response) => {
+  try {
+    const payload = completeRegistrationSchema.parse(req.body);
+    const data = await authService.completeRegistrationFromActivation(payload);
+    res.status(201).json({
+      success: true,
+      message: "Registration completed successfully.",
+      data,
+    });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.errors || error.message });
+  }
+};
+
+export const completeProfile = async (req: Request, res: Response) => {
+  try {
+    if (!req.user?.id) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const payload = completeProfileSchema.parse(req.body);
+    const data = await authService.completeUserProfile(req.user.id, payload);
+    res.json({
+      success: true,
+      message: "Profile completed successfully.",
+      data,
+    });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.errors || error.message });
   }
 };

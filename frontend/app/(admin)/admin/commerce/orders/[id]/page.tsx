@@ -10,6 +10,10 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [statusUpdating, setStatusUpdating] = useState(false);
+  const [cjActionLoading, setCjActionLoading] = useState(false);
+  const [trackingLoading, setTrackingLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [trackingData, setTrackingData] = useState<any>(null);
 
   const loadOrder = () => {
     fetchApi<any>(`/api/order/${id}`).then(res => {
@@ -38,6 +42,55 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
       alert('Failed to update status');
     } finally {
       setStatusUpdating(false);
+    }
+  };
+
+  const placeCjOrder = async () => {
+    setCjActionLoading(true);
+    setActionMessage(null);
+    try {
+      const response = await fetchApi<{ cjOrderId: string }>(`/api/cj/orders/${id}/place`, {
+        method: 'POST',
+      });
+      setActionMessage(`CJ order placed: ${response.cjOrderId}`);
+      loadOrder();
+    } catch (e: any) {
+      setActionMessage(e?.message || 'Failed to place CJ order');
+    } finally {
+      setCjActionLoading(false);
+    }
+  };
+
+  const cancelCjOrder = async () => {
+    const cjOrderId = order?.cj_order?.cj_order_id;
+    if (!cjOrderId) return;
+    setCjActionLoading(true);
+    setActionMessage(null);
+    try {
+      await fetchApi(`/api/cj/orders/${cjOrderId}/cancel`, {
+        method: 'POST',
+      });
+      setActionMessage(`CJ order ${cjOrderId} cancelled.`);
+      loadOrder();
+    } catch (e: any) {
+      setActionMessage(e?.message || 'Failed to cancel CJ order');
+    } finally {
+      setCjActionLoading(false);
+    }
+  };
+
+  const syncTracking = async () => {
+    setTrackingLoading(true);
+    setActionMessage(null);
+    try {
+      const tracking = await fetchApi<any>(`/api/order/${id}/tracking`);
+      setTrackingData(tracking);
+      setActionMessage('Tracking synced from CJ.');
+      loadOrder();
+    } catch (e: any) {
+      setActionMessage(e?.message || 'Failed to sync tracking');
+    } finally {
+      setTrackingLoading(false);
     }
   };
 
@@ -80,6 +133,35 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
               <option value="cancelled">Cancelled</option>
             </select>
           </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={placeCjOrder}
+              disabled={cjActionLoading || !!order?.cj_order}
+              className="px-3 py-2 rounded-md text-sm font-medium border border-gray-200 dark:border-gray-800 disabled:opacity-50"
+            >
+              {cjActionLoading ? 'Placing CJ Order...' : order?.cj_order ? 'CJ Order Placed' : 'Place CJ Order'}
+            </button>
+            <button
+              type="button"
+              onClick={syncTracking}
+              disabled={trackingLoading}
+              className="px-3 py-2 rounded-md text-sm font-medium border border-gray-200 dark:border-gray-800 disabled:opacity-50"
+            >
+              {trackingLoading ? 'Syncing Tracking...' : 'Sync CJ Tracking'}
+            </button>
+            <button
+              type="button"
+              onClick={cancelCjOrder}
+              disabled={cjActionLoading || !order?.cj_order?.cj_order_id}
+              className="px-3 py-2 rounded-md text-sm font-medium border border-red-200 text-red-600 dark:border-red-900/50 disabled:opacity-50"
+            >
+              Cancel CJ Order
+            </button>
+          </div>
+          {actionMessage && (
+            <p className="mt-2 text-sm text-gray-500">{actionMessage}</p>
+          )}
         </div>
       </div>
 
@@ -127,6 +209,16 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
               Address details for Address ID: {order.address_id}
             </p>
+          </div>
+
+          <div className="bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm p-6 text-sm">
+            <h3 className="font-semibold mb-4 flex items-center gap-2"><Truck size={18} /> CJ Fulfillment</h3>
+            <div className="space-y-2 text-gray-600 dark:text-gray-400">
+              <p><span className="font-medium text-black dark:text-white">CJ Order:</span> {order?.cj_order?.cj_order_id || 'Not created yet'}</p>
+              <p><span className="font-medium text-black dark:text-white">CJ Status:</span> {order?.cj_order?.cj_status || 'N/A'}</p>
+              <p><span className="font-medium text-black dark:text-white">Tracking Number:</span> {trackingData?.tracking_number || order?.shipment?.tracking_number || 'N/A'}</p>
+              <p><span className="font-medium text-black dark:text-white">Carrier:</span> {trackingData?.courier_name || order?.shipment?.courier_name || 'N/A'}</p>
+            </div>
           </div>
         </div>
       </div>

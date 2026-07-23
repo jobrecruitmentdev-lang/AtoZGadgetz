@@ -50,9 +50,12 @@ test.describe('Auth API Tests', () => {
   });
 
   // Test /me without token
-  test('GET /auth/me should fail without token', async ({ request }) => {
+  test('GET /auth/me should return 200 with null data without token', async ({ request }) => {
     const response = await request.get(`${API_URL}/auth/me`);
-    expect(response.status()).toBe(401);
+    expect(response.status()).toBe(200);
+    const body = await response.json();
+    expect(body.success).toBe(true);
+    expect(body.data).toBeNull();
   });
 
   // Test /me with token

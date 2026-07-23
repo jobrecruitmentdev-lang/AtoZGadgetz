@@ -16,12 +16,26 @@ test.describe('Public API Tests (Read-Only)', () => {
     expect(response.status()).toBe(200);
     const body = await response.json();
     expect(body.success).toBe(true);
-    // Products response usually paginated or wrapped in an array
+    
+    let productsList = [];
     if (body.data.products) {
-       expect(Array.isArray(body.data.products)).toBe(true);
+       productsList = body.data.products;
+       expect(Array.isArray(productsList)).toBe(true);
     } else {
-       expect(Array.isArray(body.data)).toBe(true);
+       productsList = body.data;
+       expect(Array.isArray(productsList)).toBe(true);
     }
+
+    console.log(`\n--- Found ${productsList.length} products on the public endpoint ---`);
+    const sample = productsList.slice(0, 10); // show top 10
+    console.log('You can view these products at the following links:');
+    sample.forEach((p: any) => {
+      // Assuming frontend runs on localhost:3000
+      console.log(`- Frontend URL: http://localhost:3000/product/${p.slug}`);
+      console.log(`  API URL:      ${API_URL}/products/${p.slug}`);
+      console.log(`  Name:         ${p.name}`);
+    });
+    console.log('--------------------------------------------------------------\n');
   });
 
   test('GET /brands should return brands list', async ({ request }) => {

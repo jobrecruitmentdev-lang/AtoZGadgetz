@@ -2,7 +2,7 @@ import { RevealText } from "@/components/motion/RevealText";
 import { RevealOnScroll } from "@/components/motion/RevealOnScroll";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import Image from "next/image";
-import { ShoppingCart, Heart, Shield, Truck, Star, Info, Package, RefreshCw } from "lucide-react";
+import { ShoppingCart, Heart, Shield, Truck, Star, Info, Package, RefreshCw, ChevronDown } from "lucide-react";
 
 import { fetchApi } from "@/lib/api-client";
 import { ProductActions } from "@/components/storefront/ProductActions";
@@ -36,7 +36,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     description: productData.description || '',
     category: productData.category?.name || 'Uncategorized',
     features: (productData.key_features ? (typeof productData.key_features === 'string' ? JSON.parse(productData.key_features) : productData.key_features) : []) as string[],
-    images: (productData.images?.map((img: any) => img.url).filter(Boolean) || []) as string[],
+    images: (productData.images?.map((img: any) => img.image || img.url).filter(Boolean) || []) as string[],
   };
   
   if (productData.thumbnail_image && product.images.length === 0) {
@@ -204,9 +204,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
                 <div className="border-t border-black/5 dark:border-white/5 pt-4">
                   <h4 className="text-sm font-semibold text-muted mb-2 uppercase tracking-wider">Description</h4>
-                  <p className="text-sm text-foreground/80 leading-relaxed">
-                    {product.description}
-                  </p>
+                  <div 
+                    className="text-sm text-foreground/80 leading-relaxed prose dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: product.description.replace(/<p>\s*<\/p>/g, '') }}
+                  />
                 </div>
 
                 <div className="border-t border-black/5 dark:border-white/5 pt-4">
@@ -215,9 +216,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     <details className="group">
                       <summary className="flex cursor-pointer items-center justify-between font-medium text-sm text-foreground/90 hover:text-accent">
                         Does this product come with a warranty?
-                        <span className="transition group-open:rotate-180">
-                          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                        </span>
+                        <ChevronDown className="w-5 h-5 text-muted transition group-open:rotate-180" />
                       </summary>
                       <p className="text-sm text-muted mt-2 group-open:animate-fadeIn">
                         Yes, all our products come with a standard 1-year manufacturer warranty against defects.
@@ -226,9 +225,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     <details className="group">
                       <summary className="flex cursor-pointer items-center justify-between font-medium text-sm text-foreground/90 hover:text-accent">
                         How long does shipping take?
-                        <span className="transition group-open:rotate-180">
-                          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                        </span>
+                        <ChevronDown className="w-5 h-5 text-muted transition group-open:rotate-180" />
                       </summary>
                       <p className="text-sm text-muted mt-2 group-open:animate-fadeIn">
                         Orders are typically dispatched within 24 hours. Standard delivery takes 3-7 business days depending on your location.

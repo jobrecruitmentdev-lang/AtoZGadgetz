@@ -50,7 +50,7 @@ const PRICE_LINKS = [
   { label: 'Limited Offers', slug: 'limited-time-offers' },
 ];
 
-export function Header() {
+export function Header({ activeCategorySlugs }: { activeCategorySlugs?: string[] }) {
   const { user } = useAuth();
   const { cart } = useCart();
   const wishlist: any[] = [];
@@ -60,6 +60,9 @@ export function Header() {
   const [openMega, setOpenMega] = useState<string | null>(null);
   const pathname = usePathname();
   const closeTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Convert array prop to Set for O(1) lookups
+  const activeSlugsSet = activeCategorySlugs ? new Set(activeCategorySlugs) : null;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -170,7 +173,10 @@ export function Header() {
                 All Products
               </Link>
 
-            {NAV_CATEGORIES.map((cat) => (
+            {NAV_CATEGORIES.filter(cat => 
+              cat.slug === null || 
+              (activeSlugsSet !== null && activeSlugsSet.has(cat.slug))
+            ).map((cat) => (
               <div
                 key={cat.label}
                 className="relative"
@@ -323,7 +329,10 @@ export function Header() {
                 <Link href="/products" className="px-3 py-2.5 rounded-lg hover:bg-foreground/5">All Products</Link>
                 <div className="h-px bg-foreground/10 my-2" />
                 <p className="text-xs text-muted uppercase tracking-widest px-3 py-1">Categories</p>
-                {NAV_CATEGORIES.map((cat) => (
+                {NAV_CATEGORIES.filter(cat => 
+                  cat.slug === null || 
+                  (activeSlugsSet !== null && activeSlugsSet.has(cat.slug))
+                ).map((cat) => (
                   <Link
                     key={cat.label}
                     href={cat.slug ? `/category/${cat.slug}` : '/products'}

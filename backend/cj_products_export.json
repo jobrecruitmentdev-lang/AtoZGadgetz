@@ -1,0 +1,30 @@
+[
+  {
+    "cjPid": "E2E-CJ-1784700110634",
+    "productName": "AtoZ Smart LED RGB Desk Lamp",
+    "sku": "SKU-E2E-1784700110634",
+    "supplierPrice": 15,
+    "sellingPrice": 37.5,
+    "category": "Smart Electronics",
+    "subcategory": "Home Tech",
+    "images": [
+      "https://cc-west-usa.oss-us-west-1.aliyuncs.com/lamp1.jpg",
+      "https://cc-west-usa.oss-us-west-1.aliyuncs.com/lamp2.jpg"
+    ],
+    "variants": [
+      {
+        "name": "Color",
+        "value": "Space Gray",
+        "additionalPrice": 0,
+        "stock": 100
+      },
+      {
+        "name": "Color",
+        "value": "Nordic White",
+        "additionalPrice": 0,
+        "stock": 100
+      }
+    ],
+    "importedAt": "2026-07-22T06:01:50.634Z"
+  }
+]

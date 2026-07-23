@@ -31,9 +31,9 @@ export class CjSyncService {
           
           let list: any[] = [];
           if (Array.isArray(raw)) list = raw;
-          else if (Array.isArray(raw?.list)) list = raw.list;
-          else if (Array.isArray(raw?.content)) {
-            for (const group of raw.content) {
+          else if (Array.isArray((raw as any)?.list)) list = (raw as any).list;
+          else if (Array.isArray((raw as any)?.content)) {
+            for (const group of (raw as any).content) {
               if (Array.isArray(group?.productList)) list.push(...group.productList);
             }
           }

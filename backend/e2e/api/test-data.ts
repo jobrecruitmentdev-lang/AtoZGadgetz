@@ -8,7 +8,7 @@ export const TEST_USER = {
   first_name: 'Test',
   last_name: 'UserE2E',
   email: `e2etest_${Date.now()}@atozgadgetz.com`, // using timestamp to ensure uniqueness per test run for registration test
-  mobile: `${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+  mobile: `+1${Math.floor(1000000000 + Math.random() * 9000000000)}`,
   password: 'Password123!'
 };
 
@@ -17,7 +17,7 @@ export const STATIC_USER = {
   first_name: 'Static',
   last_name: 'TestUser',
   email: 'static_e2e@atozgadgetz.com',
-  mobile: '0987654321',
+  mobile: '+10987654321',
   password: 'Password123!'
 };
 

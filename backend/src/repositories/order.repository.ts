@@ -16,7 +16,33 @@ export class OrderRepository {
   async findById(id: number) {
     return prisma.order.findUnique({
       where: { id },
-      include: { items: true, status_history: true },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: { cj_product: true },
+            },
+            variant: true,
+          },
+        },
+        status_history: true,
+        cj_order: true,
+        shipment: {
+          include: { cj_shipment: true },
+        },
+      },
+    });
+  }
+
+  async findInvoiceById(id: number) {
+    return prisma.order.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        address: true,
+        items: true,
+        payment: true,
+      },
     });
   }
 

@@ -4,8 +4,8 @@ import { Prisma } from "@prisma/client";
 const categoryRepo = new CategoryRepository();
 
 export class CategoryService {
-  async getAllCategories() {
-    return categoryRepo.findAll();
+  async getAllCategories(onlyWithProducts = false) {
+    return categoryRepo.findAll(onlyWithProducts);
   }
 
   async createCategory(data: Prisma.CategoryUncheckedCreateInput) {

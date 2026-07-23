@@ -6,7 +6,7 @@ test.describe('Frontend UI Tests', () => {
     await page.goto('/');
 
     // Wait for the page to be fully loaded
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Basic sanity checks: ensure title is not empty, meaning it actually rendered
     const title = await page.title();

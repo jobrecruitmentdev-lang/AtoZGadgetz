@@ -6,7 +6,8 @@ const categoryService = new CategoryService();
 
 export const getCategories = async (req: Request, res: Response) => {
   try {
-    const categories = await categoryService.getAllCategories();
+    const onlyWithProducts = req.query.hasProducts === "true" || req.query.activeOnly === "true";
+    const categories = await categoryService.getAllCategories(onlyWithProducts);
     res.json({ success: true, data: categories });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });

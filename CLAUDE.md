@@ -99,9 +99,17 @@ API_URL=http://localhost:8080/api
 
 ## CJDropshipping Integration — Current State & Roadmap
 
-CJDropshipping is **not yet integrated**. The database schema is ready (Shipment, Order, Product models) but no CJ API calls exist. See the architecture plan at `CJ_DROPSHIPPING_PLAN.md` for the full end-to-end implementation guide.
+CJDropshipping is **partially integrated**. Live API credentials are configured in `backend/.env` and the service layer is operational. See `CJ_DROPSHIPPING_PLAN.md` for the full end-to-end architecture and remaining roadmap.
 
 ### What exists today
-- `Shipment` model: `courier_name`, `tracking_number`, `status`, `shipped_at`
-- `Product` model: has fields for external supplier data but no `cj_product_id` yet
-- Payment: placeholder CRUD only — no gateway (Razorpay/Stripe) integrated
+- `CjProduct`, `CjOrder`, `CjShipment` tables + `Product.fulfillment_type` flag
+- `src/services/cj/`: auth, product search/import, order placement, shipment sync, inventory sync, category sync
+- `GET /api/cj/health` — live/sandbox status indicator
+- `GET /api/cj/browse` — single search endpoint with `minImages` quality filter and pagination
+- Admin import UI at `app/(admin)/admin/catalog/import/`: staged DB products + CJ fetch with quality filter, page-size selector, and pagination
+- 1-hour in-memory cache for CJ product details to speed up repeated hunts
+- CJ HTTP calls are serialized to ~1 req/sec to respect CJ's account-wide QPS limit
+
+### What is still pending
+- Payment gateway integration (Razorpay/Stripe) before CJ order placement can be triggered automatically
+- Production webhook hardening and signature verification

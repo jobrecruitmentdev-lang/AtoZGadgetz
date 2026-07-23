@@ -1,13 +1,15 @@
 'use client';
-import { ShoppingCart } from "lucide-react";
+
+import { ShoppingCart, Check } from "lucide-react";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { fetchApi } from "@/lib/api-client";
 import { useCart } from "@/components/storefront/CartContext";
 import { useState } from "react";
 
-export function AddToCartButton({ productId, quantity = 1 }: { productId: string | number, quantity?: number }) {
+export function AddToCartButton({ productId, quantity = 1 }: { productId: string | number; quantity?: number }) {
   const { refreshCart } = useCart();
   const [loading, setLoading] = useState(false);
+  const [added, setAdded] = useState(false);
 
   const handleAdd = async () => {
     setLoading(true);
@@ -17,14 +19,16 @@ export function AddToCartButton({ productId, quantity = 1 }: { productId: string
         body: JSON.stringify({ product_id: Number(productId), quantity })
       });
       await refreshCart();
-      // maybe open drawer? not required right now
+      setAdded(true);
+      setTimeout(() => setAdded(false), 2000);
     } catch (e: any) {
-      console.error(e);
-      if (e.message?.includes('Authorization') || e.message?.includes('auth')) {
-        alert("Please log in to add items to your cart.");
-        window.location.href = '/login';
+      console.error('Add to cart error:', e);
+      const msg = String(e.message || '').toLowerCase();
+      if (msg.includes('token') || msg.includes('authorization') || msg.includes('auth') || msg.includes('unauthorized')) {
+        alert("Please log in to add items to your shopping cart.");
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
       } else {
-        alert("Failed to add to cart: " + e.message);
+        alert("Could not add item to cart. Please try logging in again.");
       }
     } finally {
       setLoading(false);
@@ -34,10 +38,14 @@ export function AddToCartButton({ productId, quantity = 1 }: { productId: string
   return (
     <MagneticButton 
       onClick={handleAdd}
-      className="flex-1 bg-foreground text-background py-4 rounded-full font-medium flex items-center justify-center gap-2 hover:bg-accent transition-colors"
+      className={`flex-1 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-md ${
+        added 
+          ? 'bg-emerald-600 text-white' 
+          : 'bg-foreground text-background hover:bg-accent hover:text-foreground'
+      }`}
     >
-      <ShoppingCart size={20} />
-      {loading ? 'Adding...' : 'Add to Cart'}
+      {added ? <Check size={20} /> : <ShoppingCart size={20} />}
+      {loading ? 'Adding...' : added ? 'Added to Cart!' : 'Add to Cart'}
     </MagneticButton>
   );
 }

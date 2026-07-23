@@ -68,7 +68,7 @@ export default async function DealsPageRoute({ params }: { params: Promise<{ slu
       products = allProducts;
     }
     
-    const cData = await fetchApi<any[]>(`/categories?v=1.1`);
+    const cData = await fetchApi<any[]>(`/categories?hasProducts=true`);
     categories = cData || [];
   } catch (err: any) {
     console.error("Failed to load products/categories", err);

@@ -14,6 +14,13 @@ export interface AuthRequest extends Request {
   user: UserWithRoleAndPermissions;
 }
 
+const isAdminLikeRole = (user: UserWithRoleAndPermissions | undefined) => {
+  if (!user) return false;
+  if (user.role_id === 1 || user.role_id === 2) return true;
+  const roleName = String(user.role?.role_name || "").trim().toLowerCase();
+  return roleName === "admin" || roleName === "super admin" || roleName === "superadmin";
+};
+
 export const authenticateJWT = async (
   req: Request,
   res: Response,
@@ -92,8 +99,8 @@ export const authorizeRBAC = (requiredPermissions: string[]) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    // Bypass RBAC for SuperAdmin and Admin
-    if (authReq.user.role_id === 1 || authReq.user.role_id === 2) {
+    // Bypass permission-string checks for admin-level roles.
+    if (isAdminLikeRole(authReq.user)) {
       return next();
     }
 
@@ -127,7 +134,7 @@ export const requireAdminOrSuperAdmin = (
   next: NextFunction,
 ) => {
   const authReq = req as AuthRequest;
-  if (!authReq.user || (authReq.user.role_id !== 1 && authReq.user.role_id !== 2)) {
+  if (!isAdminLikeRole(authReq.user)) {
     return res
       .status(403)
       .json({ success: false, message: "Forbidden: Admins only" });

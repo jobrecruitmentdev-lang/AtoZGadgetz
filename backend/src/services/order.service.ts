@@ -15,6 +15,10 @@ export class OrderService {
     return repo.findById(id);
   }
 
+  async getInvoiceById(id: number) {
+    return repo.findInvoiceById(id);
+  }
+
   async placeOrder(userId: number | undefined, payload: any) {
     return repo.placeOrder(userId, payload);
   }

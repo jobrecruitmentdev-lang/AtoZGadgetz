@@ -11,6 +11,12 @@
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "test:e2e": "playwright test",
+    "test:e2e-gateway": "tsx e2e/cj-gateway-sync.e2e.ts",
+    "test:security": "tsx --test __tests__/security/sqli-auth.test.ts",
+    "test:api": "tsx --test __tests__/api/cj-gateway.test.ts",
+    "test:local-import": "tsx scripts/test-local-import.ts",
+    "sync:live": "tsx scripts/sync-live.ts",
+    "db:clean-garbage": "tsx scripts/clean-test-garbage.ts",
     "db:clean": "tsx scripts/clean-db.ts"
   },
   "keywords": [],

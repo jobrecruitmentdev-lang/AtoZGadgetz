@@ -25,9 +25,17 @@ export default function LoginPage() {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
-      
+
+      const me = await fetchApi<{ role_id?: number; role?: { id?: number; role_name?: string } }>('/api/auth/me');
+      const roleId = Number(me?.role_id ?? me?.role?.id ?? 0);
+      const roleName = String(me?.role?.role_name || '').toLowerCase();
+
       await refreshUser();
-      router.push('/account');
+      if (roleId === 1 || roleId === 2 || roleName === 'admin' || roleName === 'super admin') {
+        router.push('/admin');
+      } else {
+        router.push('/account');
+      }
       router.refresh();
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.');

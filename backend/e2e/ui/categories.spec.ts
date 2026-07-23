@@ -11,7 +11,7 @@ test.describe('Category Pages E2E Tests', () => {
   for (const category of categories) {
     test(`Category page for ${category.name} should load and contain products`, async ({ page }) => {
       await page.goto(`/category/${category.slug}`);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Assert that the 'No products found' message is NOT visible
       const noProductsMsg = page.locator('text=No products found for this category');
