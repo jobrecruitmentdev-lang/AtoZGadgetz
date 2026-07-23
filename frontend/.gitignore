@@ -14,7 +14,11 @@
 /coverage
 
 # next.js
-/.next/
+# /.next/ (commented out to allow pushing pre-built files for cheap VPS deployments)
+/.next/cache/
+/.next/dev/
+/.next/turbopack/
+/.next/trace*
 /out/
 
 # production

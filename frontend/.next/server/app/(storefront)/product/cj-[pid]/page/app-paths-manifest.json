@@ -1,0 +1,3 @@
+{
+  "/(storefront)/product/cj-[pid]/page": "app/(storefront)/product/cj-[pid]/page.js"
+}

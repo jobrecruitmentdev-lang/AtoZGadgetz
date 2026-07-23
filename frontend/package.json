@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "echo 'Build skipped on Hostinger to save RAM (Using pre-built .next files)'",
     "start": "next start",
     "lint": "eslint"
   },

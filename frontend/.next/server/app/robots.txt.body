@@ -1,0 +1,17 @@
+User-Agent: *
+Allow: /
+Disallow: /admin
+Disallow: /server-proxy
+Disallow: /cart
+Disallow: /checkout
+
+User-Agent: ChatGPT-User
+User-Agent: GPTBot
+User-Agent: Anthropic-ai
+User-Agent: Claude-Web
+User-Agent: Google-Extended
+User-Agent: PerplexityBot
+User-Agent: OAI-SearchBot
+Allow: /
+
+Sitemap: https://atozgadgetz.com/sitemap.xml

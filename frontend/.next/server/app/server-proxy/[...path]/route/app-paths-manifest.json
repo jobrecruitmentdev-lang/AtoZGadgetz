@@ -1,0 +1,3 @@
+{
+  "/server-proxy/[...path]/route": "app/server-proxy/[...path]/route.js"
+}

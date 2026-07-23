@@ -39,6 +39,7 @@ async function handleProxy(request: NextRequest, { params }: { params: Promise<{
     
     const responseHeaders = new Headers(response.headers);
     responseHeaders.delete('content-encoding'); // fetch unzips it
+    responseHeaders.delete('content-length'); // length changes after unzipping
 
     return new NextResponse(response.body, {
       status: response.status,
