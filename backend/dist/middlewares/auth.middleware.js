@@ -1,6 +1,14 @@
 import jwt from "jsonwebtoken";
 import { prisma } from "../prisma.js";
 import { config } from "../config/env.js";
+const isAdminLikeRole = (user) => {
+    if (!user)
+        return false;
+    if (user.role_id === 1 || user.role_id === 2)
+        return true;
+    const roleName = String(user.role?.role_name || "").trim().toLowerCase();
+    return roleName === "admin" || roleName === "super admin" || roleName === "superadmin";
+};
 export const authenticateJWT = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (authHeader) {
@@ -67,8 +75,8 @@ export const authorizeRBAC = (requiredPermissions) => {
         if (!authReq.user) {
             return res.status(401).json({ success: false, message: "Unauthorized" });
         }
-        // Bypass RBAC for SuperAdmin and Admin
-        if (authReq.user.role_id === 1 || authReq.user.role_id === 2) {
+        // Bypass permission-string checks for admin-level roles.
+        if (isAdminLikeRole(authReq.user)) {
             return next();
         }
         const userPermissions = authReq.user.role.permissions.map((rp) => rp.permission.permission_name);
@@ -89,7 +97,7 @@ export const authorizeRBAC = (requiredPermissions) => {
 // covered by a dedicated entry in the permissions table.
 export const requireAdminOrSuperAdmin = (req, res, next) => {
     const authReq = req;
-    if (!authReq.user || (authReq.user.role_id !== 1 && authReq.user.role_id !== 2)) {
+    if (!isAdminLikeRole(authReq.user)) {
         return res
             .status(403)
             .json({ success: false, message: "Forbidden: Admins only" });

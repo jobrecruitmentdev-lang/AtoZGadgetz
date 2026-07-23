@@ -10,34 +10,80 @@ export const searchCjProducts = async (req, res) => {
         const keyword = String(req.query.keyword || '');
         const page = Number(req.query.page || 1);
         const size = Number(req.query.size || 20);
-        const skip = (page - 1) * size;
-        const [products, total] = await prisma.$transaction([
-            prisma.product.findMany({
-                where: {
-                    fulfillment_type: 'cj',
-                    name: { contains: keyword },
-                    is_active: true
-                },
-                skip,
-                take: size,
-                include: { cj_product: true }
-            }),
-            prisma.product.count({
-                where: {
-                    fulfillment_type: 'cj',
-                    name: { contains: keyword },
-                    is_active: true
-                }
-            })
-        ]);
-        const normalized = products.map((p) => ({
-            pid: p.cj_product?.cj_pid || p.sku,
-            name: p.name,
-            imageUrl: p.thumbnail_image || '',
-            price: Number(p.price),
-            currency: 'USD'
+        const source = String(req.query.source || 'cj'); // 'cj' or 'local'
+        const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
+        const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
+        const categoryId = req.query.categoryId ? String(req.query.categoryId) : undefined;
+        const countryCode = req.query.countryCode ? String(req.query.countryCode) : undefined;
+        const minImages = Number(req.query.minImages || 1);
+        if (source === 'local') {
+            const skip = (page - 1) * size;
+            const [products, total] = await prisma.$transaction([
+                prisma.product.findMany({
+                    where: {
+                        fulfillment_type: 'cj',
+                        name: { contains: keyword },
+                        is_active: true
+                    },
+                    skip,
+                    take: size,
+                    include: { cj_product: true }
+                }),
+                prisma.product.count({
+                    where: {
+                        fulfillment_type: 'cj',
+                        name: { contains: keyword },
+                        is_active: true
+                    }
+                })
+            ]);
+            const normalized = products.map((p) => ({
+                pid: p.cj_product?.cj_pid || p.sku,
+                productNameEn: p.name,
+                productSku: p.sku,
+                sellPrice: Number(p.price),
+                productImage: p.thumbnail_image || '',
+                categoryName: p.category?.name || 'Gadget',
+            }));
+            return res.json({ success: true, data: { list: normalized, total } });
+        }
+        // If a quality filter is requested, route through the hunt path.
+        if (minImages > 1) {
+            const raw = await CjProductService.huntProducts(keyword, minImages, page, size, {
+                minPrice,
+                maxPrice,
+                categoryId,
+                countryCode,
+            });
+            const list = Array.isArray(raw?.list) ? raw.list : [];
+            const normalized = list.map((p) => ({
+                pid: p.pid || p.id || '',
+                productNameEn: p.productNameEn || p.productName || p.nameEn || p.name || 'Trending Gadget',
+                productSku: p.productSku || p.sku || '',
+                sellPrice: parseFloat(p.sellPrice || p.nowPrice || p.price || '10.00'),
+                productImage: p.productImage || p.bigImage || p.imageUrl || '',
+                categoryName: p.categoryName || p.twoCategoryName || 'Gadget',
+                huntedImageCount: p.huntedImageCount || 0,
+            }));
+            return res.json({ success: true, data: { list: normalized, total: raw?.total || normalized.length } });
+        }
+        // Default: Fetch live results directly from CJ Dropshipping API
+        const rawData = await CjProductService.searchProducts(keyword, page, size, {
+            minPrice,
+            maxPrice,
+            categoryId,
+            countryCode
+        });
+        const rawList = Array.isArray(rawData?.list) ? rawData.list : [];
+        const normalized = rawList.map((p) => ({
+            pid: p.pid || p.id || '',
+            productNameEn: p.productNameEn || p.productName || p.nameEn || p.name || 'Trending Gadget',
+            productSku: p.productSku || p.sku || '',
+            sellPrice: parseFloat(p.sellPrice || p.nowPrice || p.price || '10.00'),
+            productImage: p.productImage || p.bigImage || p.imageUrl || '',
+            categoryName: p.categoryName || p.twoCategoryName || 'Gadget',
         }));
-        res.json({ success: true, data: { list: normalized, total } });
+        res.json({ success: true, data: { list: normalized, total: rawData?.total || normalized.length } });
     }
     catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -49,16 +95,26 @@ export const huntCjProducts = async (req, res) => {
         const minImages = Number(req.query.minImages || 3);
         const page = Number(req.query.page || 1);
         const size = Number(req.query.size || 20);
-        const raw = await CjProductService.huntProducts(keyword, minImages, page, size);
-        // Normalize the hunted products
+        const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
+        const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
+        const categoryId = req.query.categoryId ? String(req.query.categoryId) : undefined;
+        const countryCode = req.query.countryCode ? String(req.query.countryCode) : undefined;
+        const raw = await CjProductService.huntProducts(keyword, minImages, page, size, {
+            minPrice,
+            maxPrice,
+            categoryId,
+            countryCode,
+        });
+        // Normalize the hunted products to match frontend expectations exactly
         const list = Array.isArray(raw?.list) ? raw.list : [];
         const normalized = list.map((p) => ({
-            pid: p.id || p.pid || '',
-            name: p.nameEn || p.name || '',
-            imageUrl: p.bigImage || p.imageUrl || '',
-            price: parseFloat(p.sellPrice || p.nowPrice || p.price || '0'),
-            currency: p.currency || 'USD',
-            huntedImageCount: p.huntedImageCount || 1, // Will be > minImages if hunted successfully
+            pid: p.pid || p.id || '',
+            productNameEn: p.productNameEn || p.productName || p.nameEn || p.name || 'Trending Gadget',
+            productSku: p.productSku || p.sku || '',
+            sellPrice: parseFloat(p.sellPrice || p.nowPrice || p.price || '10.00'),
+            productImage: p.productImage || p.bigImage || p.imageUrl || '',
+            categoryName: p.categoryName || p.twoCategoryName || 'Gadget',
+            huntedImageCount: p.huntedImageCount || 0,
         }));
         res.json({ success: true, data: { list: normalized, total: raw?.total || normalized.length } });
     }
@@ -112,7 +168,6 @@ export const cancelCjOrder = async (req, res) => {
 export const syncShipment = async (req, res) => {
     try {
         const { orderId } = req.params;
-        // Best-effort sync; then always return current shipment data
         try {
             await CjShipmentService.syncShipment(Number(orderId));
         }
@@ -133,14 +188,11 @@ export const syncAllShipments = async (_req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-// Auto-import a CJ product by pid — used when customer clicks "Add to Cart" on a CJ product
-// Requires auth (customer or admin). Finds or creates the DB product, returns its id.
 export const autoImportCjProduct = async (req, res) => {
     try {
         const { cjPid } = req.body;
         if (!cjPid)
             return res.status(400).json({ success: false, message: 'cjPid is required' });
-        // Check if already imported
         const existing = await prisma.cjProduct.findUnique({
             where: { cj_pid: cjPid },
             include: { product: true },
@@ -148,7 +200,6 @@ export const autoImportCjProduct = async (req, res) => {
         if (existing?.product) {
             return res.json({ success: true, data: { productId: existing.product.id } });
         }
-        // Find a default category + subcategory (use first available)
         const firstCat = await prisma.category.findFirst();
         const firstSub = await prisma.subCategory.findFirst({ where: { category_id: firstCat?.id } });
         if (!firstCat || !firstSub) {
@@ -198,11 +249,19 @@ export const syncAllCjInventory = async (_req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
-// Called by CJ Dropshipping — no auth header, verify by IP allowlist in production
 export const handleCjWebhook = async (req, res) => {
     try {
         await CjShipmentService.handleWebhook(req.body);
         res.json({ success: true });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const getCjHealth = async (_req, res) => {
+    try {
+        const health = await CjProductService.verifyConnection();
+        res.json({ success: true, data: health });
     }
     catch (error) {
         res.status(500).json({ success: false, message: error.message });

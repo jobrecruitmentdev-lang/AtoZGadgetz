@@ -1,6 +1,9 @@
 import { Prisma } from "@prisma/client";
 export declare class CategoryRepository {
-    findAll(): Promise<({
+    findAll(onlyWithProducts?: boolean): Promise<({
+        _count: {
+            products: number;
+        };
         subcategories: {
             id: number;
             category_id: number;

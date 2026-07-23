@@ -3,8 +3,8 @@ import axios from 'axios';
 // sometimes throws an explicit "Too Many Requests" error and sometimes silently
 // returns an empty result set with a 200 — both looked like "no products" bugs
 // until traced back to concurrent/rapid calls. This gate serializes every outbound
-// CJ call (auth, search, product detail, orders, shipments) to stay under the limit.
-const MIN_INTERVAL_MS = 1300;
+// CJ call (auth, search, product detail, orders, shipments) to stay just under the limit.
+const MIN_INTERVAL_MS = 1100;
 let chain = Promise.resolve();
 let lastCallAt = 0;
 function throttle() {

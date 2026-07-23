@@ -5,6 +5,7 @@ import helmet from "helmet";
 import pinoHttp from "pino-http";
 import rateLimit from "express-rate-limit";
 import { logger } from "./utils/logger.js";
+import { execSync } from "child_process";
 import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import productRoutes from "./routes/product.routes.js";
@@ -80,6 +81,13 @@ const authLimiter = rateLimit({
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 app.use("/api/auth/forgot-password", authLimiter);
+// API responses are dynamic and must never be edge/browser-cached — without this,
+// Hostinger's default edge (hcdn) caches GET responses for hours, serving stale
+// data (e.g. a stale product list) to real customers after every write.
+app.use("/api", (req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    next();
+});
 // Routes
 app.get("/health", (req, res) => {
     res.status(200).json({ status: "ok" });
@@ -118,6 +126,16 @@ app.use((err, req, res, next) => {
 });
 app.listen(PORT, async () => {
     logger.info(`Server is running on port ${PORT}`);
+    if (process.env.NODE_ENV === "production") {
+        try {
+            logger.info("Production mode detected. Automatically pushing database schema...");
+            execSync("npx prisma db push --accept-data-loss", { stdio: "inherit" });
+            logger.info("Database schema synchronized successfully!");
+        }
+        catch (dbErr) {
+            logger.error({ err: dbErr }, "Failed to push database schema during startup.");
+        }
+    }
     try {
         await startWorkers();
     }
@@ -125,4 +143,6 @@ app.listen(PORT, async () => {
         logger.error({ err }, "Failed to start background queue/workers:");
     }
 });
+export { app };
+export default app;
 //# sourceMappingURL=server.js.map

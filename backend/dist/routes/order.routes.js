@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllOrders, getMyOrders, getOrderById, placeOrder, updateOrderStatus, } from "../controllers/order.controller.js";
+import { getAllOrders, getMyOrders, getOrderById, getOrderInvoice, placeOrder, updateOrderStatus, } from "../controllers/order.controller.js";
 import { syncShipment } from "../controllers/cj.controller.js";
 import { authenticateJWT, optionalAuthenticateJWT, requireAdminOrSuperAdmin, } from "../middlewares/auth.middleware.js";
 const router = Router();
@@ -7,6 +7,7 @@ const router = Router();
 router.get("/", authenticateJWT, requireAdminOrSuperAdmin, getAllOrders);
 router.get("/mine", authenticateJWT, getMyOrders);
 router.get("/:id", authenticateJWT, getOrderById);
+router.get("/:id/invoice", authenticateJWT, getOrderInvoice);
 router.post("/place", optionalAuthenticateJWT, placeOrder);
 router.patch("/:id/status", authenticateJWT, requireAdminOrSuperAdmin, updateOrderStatus);
 // Tracking info for a customer order (syncs from CJ then returns shipment)

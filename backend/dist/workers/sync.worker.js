@@ -15,7 +15,12 @@ export const startWorkers = async () => {
             console.log('[Worker] Completed CJ Products Sync.');
         }
         catch (error) {
-            console.error('[Worker] Failed CJ Products Sync:', error);
+            if (error.message?.includes("Can't reach database server") || error.code === 'P1001') {
+                console.warn('[Worker] ⚠️ Local MySQL DB is offline at localhost:3306. Background CJ sync skipped.');
+            }
+            else {
+                console.error('[Worker] Failed CJ Products Sync:', error.message || error);
+            }
         }
         finally {
             isSyncing = false;

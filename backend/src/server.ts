@@ -5,6 +5,7 @@ import helmet from "helmet";
 import pinoHttp from "pino-http";
 import rateLimit from "express-rate-limit";
 import { logger } from "./utils/logger.js";
+import { execSync } from "child_process";
 
 import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
@@ -138,6 +139,16 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 app.listen(PORT, async () => {
   logger.info(`Server is running on port ${PORT}`);
+  
+  if (process.env.NODE_ENV === "production") {
+    try {
+      logger.info("Production mode detected. Automatically pushing database schema...");
+      execSync("npx prisma db push --accept-data-loss", { stdio: "inherit" });
+      logger.info("Database schema synchronized successfully!");
+    } catch (dbErr) {
+      logger.error({ err: dbErr }, "Failed to push database schema during startup.");
+    }
+  }
   
   try {
     await startWorkers();

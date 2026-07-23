@@ -1,6 +1,9 @@
 import { Prisma } from "@prisma/client";
 export declare class CategoryService {
-    getAllCategories(): Promise<({
+    getAllCategories(onlyWithProducts?: boolean): Promise<({
+        _count: {
+            products: number;
+        };
         subcategories: {
             id: number;
             category_id: number;

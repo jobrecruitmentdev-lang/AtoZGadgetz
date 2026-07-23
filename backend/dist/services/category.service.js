@@ -1,8 +1,8 @@
 import { CategoryRepository } from "../repositories/category.repository.js";
 const categoryRepo = new CategoryRepository();
 export class CategoryService {
-    async getAllCategories() {
-        return categoryRepo.findAll();
+    async getAllCategories(onlyWithProducts = false) {
+        return categoryRepo.findAll(onlyWithProducts);
     }
     async createCategory(data) {
         return categoryRepo.create(data);

@@ -10,6 +10,9 @@ export class OrderService {
     async getById(id) {
         return repo.findById(id);
     }
+    async getInvoiceById(id) {
+        return repo.findInvoiceById(id);
+    }
     async placeOrder(userId, payload) {
         return repo.placeOrder(userId, payload);
     }

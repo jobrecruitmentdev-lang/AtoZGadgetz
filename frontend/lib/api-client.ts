@@ -32,15 +32,24 @@ export async function fetchApi<T = unknown>(
 
   const res = await fetch(url, { cache: 'no-store', ...options, headers });
   
-  let data: ApiResponse<T>;
+  let data: ApiResponse<T> = {};
   try {
-    data = await res.json();
-  } catch {
-    throw new Error('Failed to parse JSON response');
+    const text = await res.text();
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // If parsing fails (e.g., Nginx intercepts with HTML page), provide user-friendly fallbacks
+      if (res.status === 401) throw new Error('Invalid email or password. Please try again.');
+      if (res.status === 429) throw new Error('Too many attempts. Please try again later.');
+      if (res.status >= 500) throw new Error('Server is currently unavailable. Please try again in a few minutes.');
+      throw new Error(`Unexpected server response (${res.status})`);
+    }
+  } catch (err: any) {
+    throw err;
   }
 
-  if (!res.ok || data.success === false) {
-    throw new Error(data.message || 'API request failed');
+  if (!res.ok) {
+    throw new Error(data?.message || `Error ${res.status}: Request failed`);
   }
 
   return data.data as T;

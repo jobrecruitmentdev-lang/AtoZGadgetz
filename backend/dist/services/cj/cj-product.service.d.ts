@@ -1,16 +1,49 @@
 export declare class CjProductService {
     private static readonly API_BASE_URL;
+    private static readonly DETAIL_CACHE_TTL_MS;
+    private static detailCache;
     /**
-     * Search for products in CJ Dropshipping catalog
+     * Search for products in CJ Dropshipping catalog with resource filters
      */
-    static searchProducts(keyword: string, pageNum?: number, pageSize?: number): Promise<any>;
-    /**
-     * Hunt for high-quality products by verifying image counts
-     */
-    static huntProducts(keyword: string, minImages?: number, pageNum?: number, pageSize?: number): Promise<{
+    static searchProducts(keyword: string, pageNum?: number, pageSize?: number, filters?: {
+        minPrice?: number;
+        maxPrice?: number;
+        categoryId?: string;
+        countryCode?: string;
+    }): Promise<{
         list: any[];
         total: any;
     }>;
+    /**
+     * Hunt for high-quality products by verifying image counts.
+     * When minImages <= 1 the filter is skipped and the raw search page is returned.
+     * For minImages > 1 each candidate on the requested page is fetched via
+     * getProductDetail and only products with enough images are kept.
+     * A soft deadline prevents the request from hanging longer than ~20s.
+     */
+    static huntProducts(keyword: string, minImages?: number, pageNum?: number, pageSize?: number, filters?: {
+        minPrice?: number;
+        maxPrice?: number;
+        categoryId?: string;
+        countryCode?: string;
+    }): Promise<{
+        list: any[];
+        total: any;
+    }>;
+    /**
+     * Quick health check that proves CJ credentials work and live products return.
+     */
+    static verifyConnection(): Promise<{
+        connected: boolean;
+        tokenType: string;
+        sampleProductCount: number;
+        totalAvailable: any;
+        message: string;
+    }>;
+    /**
+     * Count usable images in a CJ product detail payload.
+     */
+    private static countImagesInDetail;
     /**
      * Get product details by CJ Product ID
      */

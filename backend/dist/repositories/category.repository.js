@@ -1,7 +1,22 @@
 import { prisma } from "../prisma.js";
 export class CategoryRepository {
-    async findAll() {
-        return prisma.category.findMany({ include: { subcategories: true } });
+    async findAll(onlyWithProducts) {
+        const whereClause = onlyWithProducts
+            ? {
+                products: {
+                    some: { is_active: true },
+                },
+            }
+            : {};
+        return prisma.category.findMany({
+            where: whereClause,
+            include: {
+                subcategories: true,
+                _count: {
+                    select: { products: true },
+                },
+            },
+        });
     }
     async create(data) {
         return prisma.category.create({ data });
