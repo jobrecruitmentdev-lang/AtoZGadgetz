@@ -4,8 +4,8 @@ import { Prisma } from "@prisma/client";
 const productRepo = new ProductRepository();
 
 export class ProductService {
-  async getAllProducts() {
-    return productRepo.findAll();
+  async getAllProducts(limit?: number) {
+    return productRepo.findAll(limit);
   }
 
   async getProductBySlug(slug: string) {

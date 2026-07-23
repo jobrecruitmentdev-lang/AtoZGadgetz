@@ -2,14 +2,16 @@ import { prisma } from "../prisma.js";
 import { Prisma } from "@prisma/client";
 
 export class ProductRepository {
-  async findAll() {
+  async findAll(limit?: number) {
     return prisma.product.findMany({
+      take: limit,
       include: {
         category: true,
         brand: true,
         images: true,
         variants: true,
       },
+      orderBy: { created_at: 'desc' },
     });
   }
 

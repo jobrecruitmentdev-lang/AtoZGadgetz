@@ -1,13 +1,15 @@
 import { prisma } from "../prisma.js";
 export class ProductRepository {
-    async findAll() {
+    async findAll(limit) {
         return prisma.product.findMany({
+            take: limit,
             include: {
                 category: true,
                 brand: true,
                 images: true,
                 variants: true,
             },
+            orderBy: { created_at: 'desc' },
         });
     }
     async findBySlug(slug) {

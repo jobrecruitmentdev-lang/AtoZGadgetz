@@ -1,10 +1,16 @@
 import { CategoryService } from "../services/category.service.js";
 import { createCategorySchema } from "../validators/category.schema.js";
+import { globalCache } from "../utils/cache.js";
 const categoryService = new CategoryService();
 export const getCategories = async (req, res) => {
     try {
         const onlyWithProducts = req.query.hasProducts === "true" || req.query.activeOnly === "true";
-        const categories = await categoryService.getAllCategories(onlyWithProducts);
+        const cacheKey = `categories_hasProducts_${onlyWithProducts}`;
+        let categories = globalCache.get(cacheKey);
+        if (!categories) {
+            categories = await categoryService.getAllCategories(onlyWithProducts);
+            globalCache.set(cacheKey, categories, 120); // Cache for 2 minutes
+        }
         res.json({ success: true, data: categories });
     }
     catch (error) {

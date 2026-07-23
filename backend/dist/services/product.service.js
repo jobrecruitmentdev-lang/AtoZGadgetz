@@ -1,8 +1,8 @@
 import { ProductRepository } from "../repositories/product.repository.js";
 const productRepo = new ProductRepository();
 export class ProductService {
-    async getAllProducts() {
-        return productRepo.findAll();
+    async getAllProducts(limit) {
+        return productRepo.findAll(limit);
     }
     async getProductBySlug(slug) {
         const numericId = parseInt(slug, 10);

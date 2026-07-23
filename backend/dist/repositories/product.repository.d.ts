@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 export declare class ProductRepository {
-    findAll(): Promise<({
+    findAll(limit?: number): Promise<({
         brand: {
             id: number;
             name: string;

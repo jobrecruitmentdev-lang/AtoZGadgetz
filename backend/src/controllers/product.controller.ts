@@ -2,12 +2,21 @@ import { Request, Response } from "express";
 import { ProductService } from "../services/product.service.js";
 import { createProductSchema } from "../validators/product.schema.js";
 import { prisma } from "../prisma.js";
+import { globalCache } from "../utils/cache.js";
 
 const productService = new ProductService();
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await productService.getAllProducts();
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+    const cacheKey = `products_${limit || 'all'}`;
+    
+    let products = globalCache.get(cacheKey);
+    if (!products) {
+      products = await productService.getAllProducts(limit);
+      globalCache.set(cacheKey, products, 60); // Cache for 60 seconds
+    }
+    
     res.json({ success: true, data: products });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
