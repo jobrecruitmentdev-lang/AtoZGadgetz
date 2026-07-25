@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const rawBaseUrl =
       process.env.API_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
-      'http://localhost:8080';
+      'https://bukcsheet.atozgadgetz.com/api';
     const normalizedBase = rawBaseUrl.replace(/\/+$/, '');
     const apiBaseUrl = normalizedBase.endsWith('/api')
       ? normalizedBase

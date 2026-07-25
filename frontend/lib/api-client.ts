@@ -38,11 +38,17 @@ export async function fetchApi<T = unknown>(
     try {
       data = JSON.parse(text);
     } catch {
+      console.error(`Failed to parse JSON from ${url}. Status: ${res.status}. Body preview:`, text.substring(0, 500));
       // If parsing fails (e.g., Nginx intercepts with HTML page), provide user-friendly fallbacks
       if (res.status === 401) throw new Error('Invalid email or password. Please try again.');
       if (res.status === 429) throw new Error('Too many attempts. Please try again later.');
       if (res.status >= 500) throw new Error('Server is currently unavailable. Please try again in a few minutes.');
-      throw new Error(`Unexpected server response (${res.status})`);
+      
+      const isHtml = text.trim().toLowerCase().startsWith('<');
+      if (isHtml) {
+        throw new Error(`Server returned an unexpected HTML page (${res.status}). This might be a firewall or Cloudflare issue.`);
+      }
+      throw new Error(`Unexpected server response (${res.status}): ${text.substring(0, 100)}...`);
     }
   } catch (err: any) {
     throw err;

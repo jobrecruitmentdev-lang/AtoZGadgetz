@@ -16,6 +16,7 @@ async function handleProxy(request: NextRequest, { params }: { params: Promise<{
     const headers = new Headers(request.headers);
     headers.delete('host');
     headers.delete('connection');
+    headers.delete('accept-encoding'); // CRITICAL: Let Node.js negotiate compression to avoid zstd bugs
     
     // Add token from cookie to Authorization header
     const cookieStore = await cookies();

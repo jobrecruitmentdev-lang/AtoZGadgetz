@@ -12,11 +12,19 @@ async function findCategoryBySlug(slug: string) {
   try {
     const cData = await fetchApi<{ data?: any[] } | any[]>('/categories?hasProducts=true');
     const categories = Array.isArray(cData) ? cData : cData?.data || [];
+    
+    // O(1) Lookup Table
+    const catMap = new Map();
     for (const c of categories) {
-      if (c.slug === slug) return c;
-      const sub = c.subcategories?.find((s: any) => s.slug === slug);
-      if (sub) return sub;
+      catMap.set(c.slug, c);
+      if (c.subcategories) {
+        for (const s of c.subcategories) {
+          catMap.set(s.slug, s);
+        }
+      }
     }
+    
+    return catMap.get(slug) || null;
   } catch {
     // fall through to slug-derived defaults
   }
@@ -77,8 +85,17 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     console.error('CategoryPage: failed to load', err);
   }
 
-  const cat = categories.find((c: any) => c.slug === slug) ??
-    categories.flatMap((c: any) => c.subcategories || []).find((s: any) => s.slug === slug);
+  // O(1) Map for category lookup
+  const catMap = new Map();
+  for (const c of categories) {
+    catMap.set(c.slug, c);
+    if (c.subcategories) {
+      for (const s of c.subcategories) {
+        catMap.set(s.slug, s);
+      }
+    }
+  }
+  const cat = catMap.get(slug);
   const displayName = cat?.name ||
     slug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   const description = cat?.seo_description || cat?.description ||
